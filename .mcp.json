@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "ue-llm-toolkit": {
+      "command": "node",
+      "args": ["Client-Unreal/PromptMotionClient/Plugins/UELLMToolkit/Resources/mcp-bridge/index.js"],
+      "env": {
+        "UNREAL_MCP_URL": "http://localhost:3001"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1.0",
+	"FriendlyName": "Prompt Motion Editor",
+	"Description": "Editor tools for PromptMotionLab procedural gesture preview and prompt export.",
+	"Category": "Animation",
+	"CreatedBy": "PromptMotionLab",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"Modules": [
+		{
+			"Name": "PromptMotionEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}

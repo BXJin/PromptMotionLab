@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://promptmotionlab.local/contracts/skeleton_preset.schema.json",
+  "title": "SkeletonPreset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["skeletonPreset", "capabilities"],
+  "properties": {
+    "skeletonPreset": {
+      "type": "string"
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["upperBodyIk", "fingerControls", "facialControls", "headLook", "rootMotion"],
+      "properties": {
+        "upperBodyIk": { "type": "boolean" },
+        "fingerControls": { "type": "boolean" },
+        "facialControls": { "type": "boolean" },
+        "headLook": { "type": "boolean" },
+        "rootMotion": { "type": "boolean" }
+      }
+    }
+  }
+}
+

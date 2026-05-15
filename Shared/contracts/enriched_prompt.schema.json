@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://promptmotionlab.local/contracts/enriched_prompt.schema.json",
+  "title": "EnrichedPromptExport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "exportId",
+    "originalPrompt",
+    "enrichedPrompt",
+    "motionSpec",
+    "createdAtUtc",
+    "targetProviderHint"
+  ],
+  "properties": {
+    "exportId": {
+      "type": "string"
+    },
+    "originalPrompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "enrichedPrompt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "motionSpec": {
+      "$ref": "./motion_spec.schema.json"
+    },
+    "createdAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "targetProviderHint": {
+      "type": "string"
+    }
+  }
+}
+

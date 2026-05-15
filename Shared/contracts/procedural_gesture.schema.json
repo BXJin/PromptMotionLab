@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://promptmotionlab.local/contracts/procedural_gesture.schema.json",
+  "title": "ProceduralGestureJson",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "gesture",
+    "hand",
+    "durationSeconds",
+    "speed",
+    "amplitude",
+    "shoulderRaise",
+    "elbowBend",
+    "wristOscillation",
+    "bodyLean",
+    "headNod",
+    "feetPlanted",
+    "rootMotion",
+    "skeletonPreset"
+  ],
+  "properties": {
+    "gesture": {
+      "type": "string"
+    },
+    "hand": {
+      "type": "string",
+      "enum": ["left", "right", "both", "none"]
+    },
+    "durationSeconds": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 10.0
+    },
+    "speed": {
+      "type": "number",
+      "minimum": 0.2,
+      "maximum": 3.0
+    },
+    "amplitude": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "shoulderRaise": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "elbowBend": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "wristOscillation": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "bodyLean": {
+      "type": "number",
+      "minimum": -1.0,
+      "maximum": 1.0
+    },
+    "headNod": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "feetPlanted": {
+      "type": "boolean"
+    },
+    "rootMotion": {
+      "type": "boolean"
+    },
+    "skeletonPreset": {
+      "type": "string",
+      "default": "ue5_manny"
+    }
+  }
+}
+

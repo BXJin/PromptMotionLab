@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://promptmotionlab.local/contracts/motion_spec.schema.json",
+  "title": "MotionSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "gesture",
+    "hand",
+    "emotion",
+    "style",
+    "bodyScope",
+    "durationSeconds",
+    "speed",
+    "amplitude",
+    "feetPlanted",
+    "rootMotion",
+    "skeletonPreset"
+  ],
+  "properties": {
+    "gesture": {
+      "type": "string",
+      "enum": ["wave", "point", "bow", "nod", "explain"]
+    },
+    "hand": {
+      "type": "string",
+      "enum": ["left", "right", "both", "none"]
+    },
+    "emotion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "style": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "bodyScope": {
+      "type": "string",
+      "enum": ["upper_body", "full_body"]
+    },
+    "durationSeconds": {
+      "type": "number",
+      "minimum": 0.3,
+      "maximum": 10.0
+    },
+    "speed": {
+      "type": "number",
+      "minimum": 0.2,
+      "maximum": 3.0
+    },
+    "amplitude": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "feetPlanted": {
+      "type": "boolean"
+    },
+    "rootMotion": {
+      "type": "boolean"
+    },
+    "skeletonPreset": {
+      "type": "string",
+      "default": "ue5_manny"
+    }
+  }
+}
+
