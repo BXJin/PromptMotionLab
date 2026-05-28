@@ -34,6 +34,40 @@ Final STT = answer generation
 
 Do not generate multiple LLM answers for every filler phrase.
 
+## VAD And EoT Goal
+
+VAD and EoT are part of the latency goal, but they are not first-step requirements.
+
+Definitions:
+
+- VAD: Voice Activity Detection. Detect whether the user is speaking, silent, or only making noise.
+- EoT: End of Turn. Decide when the user has actually finished speaking and the answer pipeline should start.
+
+MVP direction:
+
+```text
+Push-to-talk STT first
+-> record STT / LLM / TTS / visible reaction latency
+-> add VAD for automatic listening start/stop
+-> add EoT for natural turn-taking
+-> add interruption / barge-in only after the basic loop is stable
+```
+
+Why this order:
+
+- VAD/EoT improves perceived latency only if the downstream LLM/TTS loop is already measured.
+- Bad EoT is worse than no EoT because it starts answering while the user is still speaking.
+- Push-to-talk creates a clean baseline for measuring ASR-to-character latency.
+
+Target signals to record later:
+
+- speech_start_detected_at
+- speech_end_detected_at
+- final_stt_ready_at
+- eot_decision_at
+- silence_duration_ms
+- stt_confidence
+
 Example input:
 
 ```text

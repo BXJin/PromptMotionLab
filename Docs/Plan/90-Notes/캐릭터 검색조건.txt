@@ -41,3 +41,53 @@
   AccuRi
   
  .검색조건
+ 
+  https://www.fab.com/listings/332341c5-0174-4a1a-81f3-34f92de4b835
+  
+    curl -X POST http://127.0.0.1:8010/api/runtime/tts/synthesize -H "Content-Type: application/json"  -d "{\"text\":\"Hello. Nice to meet you.\",\"ttsStyle\":\"warm\"}"
+	
+	
+  Hi! I'm happy to see you today.
+
+  Expected: friendly 또는 happy
+
+  That's amazing! I can't believe it happened.
+
+  Expected: surprised / happy
+
+  Hmm, let me think about that for a second.
+
+  Expected: thinking
+
+  Wait, why did that happen?
+
+  Expected: curious 또는 uncertain
+
+  I'm a little worried about what you just said.
+
+  Expected: concerned
+
+  I'm sorry, I didn't mean to make you feel that way.
+
+  Expected: apologetic
+
+  I'm not sure. Maybe we should check it again.
+
+  Expected: uncertain
+
+  Can you tell me more about your day?
+
+  Expected: friendly / curious
+
+  Okay, I understand. Please continue.
+  
+    | ID | 성격 요약 |
+  |---|---|
+  | e_f_n | 밝고 따뜻한 상상형. 리액션 크고 공감 먼저, 약간 장난기 있음. |
+  | e_f_s | 밝고 현실적인 친구형. 따뜻하게 반응하고 구체적인 일상 표현 중심. |
+  | e_t_n | 활발한 아이디어 분석형. 에너지 높고 분석 우선, 가능성/아이디어 중심. |
+  | e_t_s | 시원시원한 현실 조언형. 밝지만 직설적이고 실용적인 답변 중심. |
+  | i_f_n | 조용하고 감성적인 상상형. 부드럽고 사려 깊게, 상상적 표현 약간. |
+  | i_f_s | 차분하고 다정한 현실형. 따뜻하지만 과하지 않고 현실적/간결함. |
+  | i_t_n | 조용한 사색/분석형. 차분하고 정밀하게 생각한 뒤 답함. |
+  | i_t_s | 침착한 실용 분석형. 가장 담백하고 현실적, 질문도 적게 함. |

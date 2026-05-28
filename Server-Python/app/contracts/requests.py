@@ -1,7 +1,10 @@
+from uuid import uuid4
+
 from pydantic import BaseModel, Field
 
 from app.contracts.motion_spec import MotionSpec
 from app.contracts.runtime_behavior import SceneContext
+from app.contracts.tts import TtsSynthesizeRequest
 
 
 class AnalyzeIntentRequest(BaseModel):
@@ -27,9 +30,9 @@ class EnrichedPromptRequest(BaseModel):
 
 
 class RuntimeRespondRequest(BaseModel):
-    session_id: str = Field("demo_session", min_length=1, alias="sessionId")
+    session_id: str = Field(default_factory=lambda: f"anon_{uuid4().hex}", min_length=1, max_length=128, alias="sessionId")
     character_id: str = Field("default_guide", min_length=1, alias="characterId")
-    message: str = Field(..., min_length=1)
+    message: str = Field(..., min_length=1, max_length=2000)
     scene_context: SceneContext = Field(default_factory=SceneContext, alias="sceneContext")
 
     model_config = {"populate_by_name": True}

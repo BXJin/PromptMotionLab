@@ -17,8 +17,10 @@ class MockRuntimeBehaviorProvider(RuntimeBehaviorProvider):
         message: str,
         scene_context: SceneContext,
         character_id: str,
+        conversation_history: list | None = None,
+        character_profile: object | None = None,
     ) -> tuple[str, BehaviorJson]:
-        del character_id
+        del character_id, conversation_history, character_profile
 
         normalized = message.strip().lower()
 
@@ -84,16 +86,16 @@ class MockRuntimeBehaviorProvider(RuntimeBehaviorProvider):
 
     def _default_response(self, scene_context: SceneContext) -> tuple[str, BehaviorJson]:
         gaze = RuntimeGaze.FOCUSED_OBJECT if scene_context.focused_object_id else RuntimeGaze.USER
-        reply = "I understand. I will answer while keeping the current spatial context in mind."
+        reply = "지금 답변 생성이 지연되고 있어요. 잠시 후 다시 시도해 주세요."
         return reply, BehaviorJson(
-            emotion=RuntimeEmotion.FRIENDLY,
+            emotion=RuntimeEmotion.UNCERTAIN,
             intensity=0.55,
-            confidence=0.74,
-            intent=RuntimeIntent.ANSWER,
+            confidence=0.35,
+            intent=RuntimeIntent.FALLBACK,
             gaze=gaze,
-            gestureKey=RuntimeGestureKey.SMALL_ACK,
-            headMotion=RuntimeHeadMotion.SMALL_NOD,
-            ttsStyle=RuntimeTtsStyle.NEUTRAL,
+            gestureKey=RuntimeGestureKey.HESITATE,
+            headMotion=RuntimeHeadMotion.THINKING_TILT,
+            ttsStyle=RuntimeTtsStyle.CAREFUL,
         )
 
     def _is_uncertain_question(self, text: str) -> bool:

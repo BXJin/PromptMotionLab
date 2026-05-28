@@ -1,0 +1,25 @@
+[
+  {
+    "id": "weather_tool_needed_ko",
+    "message": "안녕? 오늘 서울 날씨 어때?",
+    "expectedRoute": "default",
+    "expectedModelContains": "mini",
+    "expectedEmotionAny": ["friendly", "thinking", "curious", "uncertain", "neutral"],
+    "expectedIntentAny": ["answer", "clarify"]
+  },
+  {
+    "id": "object_context_ko",
+    "message": "이 작품이 어떤 의미인지 짧게 설명해줘",
+    "sceneContext": {
+      "locationId": "demo_hall",
+      "focusedObjectId": "exhibit_01",
+      "nearbyObjectIds": ["exhibit_01"],
+      "interactionMode": "object_selected"
+    },
+    "expectedRoute": "default",
+    "expectedModelContains": "mini",
+    "expectedEmotionAny": ["thinking", "curious", "friendly", "neutral"],
+    "expectedIntentAny": ["explain", "answer"],
+    "expectedGaze": "focused_object"
+  }
+]

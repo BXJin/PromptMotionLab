@@ -1,0 +1,86 @@
+[
+  {
+    "id": "greeting_cold_ko",
+    "message": "안녕 오늘 너무 춥다 그지",
+    "expectedRoute": "short_social",
+    "expectedModelContains": "nano",
+    "expectedEmotionAny": ["friendly", "concerned", "thinking"],
+    "expectedEmotionByCharacter": {
+      "i_t_n": ["friendly", "concerned", "thinking", "neutral"],
+      "i_t_s": ["friendly", "concerned", "thinking", "neutral"]
+    },
+    "expectedIntentAny": ["greet", "answer", "clarify"]
+  },
+  {
+    "id": "tired_ko",
+    "message": "나 오늘 좀 피곤해",
+    "expectedRoute": "short_social",
+    "expectedModelContains": "nano",
+    "expectedEmotionAny": ["concerned", "friendly", "thinking"],
+    "expectedIntentAny": ["answer", "clarify"]
+  },
+  {
+    "id": "simple_greeting_en",
+    "message": "Hey, good to see you.",
+    "expectedRoute": "short_social",
+    "expectedModelContains": "nano",
+    "expectedEmotionAny": ["friendly", "happy"],
+    "expectedIntentAny": ["greet", "answer"]
+  },
+  {
+    "id": "casual_followup_ko",
+    "message": "오늘 뭐 하고 있었어?",
+    "expectedRoute": "short_social",
+    "expectedModelContains": "nano",
+    "expectedEmotionAny": ["friendly", "happy", "thinking", "curious"],
+    "expectedEmotionByCharacter": {
+      "i_t_n": ["neutral", "thinking", "curious"],
+      "i_t_s": ["neutral", "thinking", "curious"]
+    },
+    "expectedIntentAny": ["answer", "clarify"]
+  },
+  {
+    "id": "daily_smalltalk_en",
+    "message": "Can you tell me more about your day?",
+    "expectedRoute": "default",
+    "expectedModelContains": "mini",
+    "expectedEmotionAny": ["friendly", "happy", "thinking", "curious"],
+    "expectedEmotionByCharacter": {
+      "i_t_n": ["neutral", "thinking", "curious"],
+      "i_t_s": ["neutral", "thinking", "curious"]
+    },
+    "expectedIntentAny": ["answer", "clarify"]
+  },
+  {
+    "id": "apology_en",
+    "message": "I'm sorry, I didn't mean to make you feel that way.",
+    "expectedEmotionAny": ["apologetic", "concerned", "friendly", "uncertain"],
+    "expectedEmotionByCharacter": {
+      "i_t_n": ["apologetic", "concerned", "friendly", "uncertain", "neutral"],
+      "i_t_s": ["apologetic", "concerned", "friendly", "uncertain", "neutral"]
+    },
+    "expectedIntentAny": ["answer", "clarify"]
+  },
+  {
+    "id": "comfort_ko",
+    "message": "오늘 좀 마음이 복잡해",
+    "expectedRoute": "default",
+    "expectedModelContains": "mini",
+    "expectedEmotionAny": ["concerned", "friendly", "thinking", "uncertain"],
+    "expectedIntentAny": ["answer", "clarify"]
+  },
+  {
+    "id": "complex_explain_ko",
+    "message": "왜 사람들이 디지털 휴먼이 실제 사람처럼 느껴진다고 생각하는지 짧게 설명해줘",
+    "expectedRoute": "default",
+    "expectedModelContains": "mini",
+    "expectedEmotionAny": ["thinking", "curious", "friendly"],
+    "expectedEmotionByCharacter": {
+      "e_f_n": ["thinking", "curious", "friendly", "happy"],
+      "e_t_s": ["thinking", "curious", "friendly", "neutral"],
+      "i_t_n": ["neutral", "thinking", "curious"],
+      "i_t_s": ["neutral", "thinking", "curious"]
+    },
+    "expectedIntentAny": ["explain", "answer"]
+  }
+]

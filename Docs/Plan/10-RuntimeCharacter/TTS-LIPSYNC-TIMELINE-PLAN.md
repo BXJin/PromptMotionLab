@@ -310,3 +310,61 @@ https://elevenlabs.io/docs/api-reference/text-to-speech/stream
 NVIDIA ACE Unreal Plugin:
 https://docs.nvidia.com/ace/ace-unreal-plugin/
 ```
+
+## Current Server Implementation
+
+Implemented server endpoints:
+
+```text
+POST /api/runtime/tts/synthesize
+GET /api/runtime/audio/{utteranceId}.wav
+```
+
+Current provider structure:
+
+```text
+TtsProvider
+- AzureSpeechTtsProvider
+- MockTtsProvider
+```
+
+Azure is selected only when these environment variables are present:
+
+```text
+AZURE_SPEECH_KEY
+AZURE_SPEECH_REGION
+AZURE_TTS_VOICE
+```
+
+Without Azure credentials or SDK support, the server returns a silent mock WAV.
+This is intentional so Unreal audio download/playback and lip-sync code can be
+implemented before cloud credentials are available.
+
+Current response shape:
+
+```json
+{
+  "speechTimeline": {
+    "utteranceId": "utt_001",
+    "audio": {
+      "url": "/api/runtime/audio/utt_001.wav",
+      "durationSeconds": 1.2,
+      "format": "wav"
+    },
+    "visemes": [
+      { "time": 0.12, "id": 1, "weight": 1.0 }
+    ],
+    "provider": "AzureSpeechTtsProvider",
+    "model": "en-US-JennyNeural",
+    "ttsLatencyMs": 420
+  }
+}
+```
+
+Next Unreal task:
+
+```text
+download wav
+-> play with AudioComponent
+-> use audio playback time to drive viseme morph targets
+```

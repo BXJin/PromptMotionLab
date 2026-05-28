@@ -10,7 +10,18 @@ public class PromptMotionClient : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "HTTP", "Json", "JsonUtilities", "UMG", "Slate", "SlateCore" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "HTTP", "Json", "JsonUtilities", "UMG", "Slate", "SlateCore", "Voice", "WebSockets" });
+		if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			PrivateDependencyModuleNames.Add("AndroidPermission");
+		}
+
+		PrivateIncludePaths.AddRange(new string[]
+		{
+			System.IO.Path.Combine(ModuleDirectory, "Runtime/Core"),
+			System.IO.Path.Combine(ModuleDirectory, "Runtime/Face"),
+			System.IO.Path.Combine(ModuleDirectory, "Runtime/UI"),
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

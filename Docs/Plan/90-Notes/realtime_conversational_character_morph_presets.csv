@@ -1,0 +1,196 @@
+﻿preset_id,preset_type,layer,morph_name,base_weight,min_weight,max_weight,priority,fade_in_sec,fade_out_sec,blend_mode,conflict_group,lip_sync_mask,character_multiplier,notes_ko
+Neutral,expression,Expression,Brow_Compress_L,0.00,0.00,1.00,30,0.12,0.18,Override,Brow_Compress,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Compress_R,0.00,0.00,1.00,30,0.12,0.18,Override,Brow_Compress,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Drop_L,0.00,0.00,1.00,30,0.12,0.18,Override,Brow_Drop,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Drop_R,0.00,0.00,1.00,30,0.12,0.18,Override,Brow_Drop,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Raise_Inner_L,0.00,0.00,1.00,30,0.12,0.18,Override,Browaise_Inner,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Raise_Inner_R,0.00,0.00,1.00,30,0.12,0.18,Override,Browaise_Inner,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Raise_Outer_L,0.00,0.00,1.00,30,0.12,0.18,Override,Browaise_Outer,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Brow_Raise_Outer_R,0.00,0.00,1.00,30,0.12,0.18,Override,Browaise_Outer,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Eye_Squint_L,0.00,0.00,1.00,30,0.12,0.18,Override,Eye_Squint,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Eye_Squint_R,0.00,0.00,1.00,30,0.12,0.18,Override,Eye_Squint,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Eye_Wide_L,0.00,0.00,1.00,30,0.12,0.18,Override,Eye_Wide,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Eye_Wide_R,0.00,0.00,1.00,30,0.12,0.18,Override,Eye_Wide,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Cheek_Raise_L,0.00,0.00,1.00,30,0.12,0.18,Override,Cheekaise,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Cheek_Raise_R,0.00,0.00,1.00,30,0.12,0.18,Override,Cheekaise,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Cheek_Suck_L,0.00,0.00,1.00,30,0.12,0.18,Override,Cheek_Suck,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Cheek_Suck_R,0.00,0.00,1.00,30,0.12,0.18,Override,Cheek_Suck,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Nose_Crease_L,0.00,0.00,1.00,30,0.12,0.18,Override,Nose_Crease,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Nose_Crease_R,0.00,0.00,1.00,30,0.12,0.18,Override,Nose_Crease,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Smile_L,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Smile,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Smile_R,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Smile,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Dimple_L,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Dimple,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Dimple_R,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Dimple,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Frown_L,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Frown,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Frown_R,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Frown,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Tighten_L,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Tighten,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Tighten_R,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Tighten,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Press_L,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Press,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Press_R,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Press,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Stretch_L,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Stretch,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Stretch_R,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Stretch,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Shrug_Upper,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Shrug_Upper,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Shrug_Lower,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Shrugower,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Jaw_Open,0.00,0.00,1.00,30,0.12,0.18,Override,Jaw_Open,1.00,1.00,기본 표정 reset 값
+Neutral,expression,Expression,Mouth_Close,0.00,0.00,1.00,30,0.12,0.18,Override,Mouth_Close,1.00,1.00,기본 표정 reset 값
+Listening,expression,Expression,Brow_Raise_Inner_L,0.10,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,상대 말을 듣는 느낌
+Listening,expression,Expression,Brow_Raise_Inner_R,0.10,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,상대 말을 듣는 느낌
+Listening,expression,Expression,Eye_Wide_L,0.08,0.00,1.00,30,0.18,0.28,Additive,Eye_Wide,1.00,1.00,주의 집중
+Listening,expression,Expression,Eye_Wide_R,0.08,0.00,1.00,30,0.18,0.28,Additive,Eye_Wide,1.00,1.00,주의 집중
+Listening,expression,Expression,Mouth_Smile_L,0.10,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,약한 호감
+Listening,expression,Expression,Mouth_Smile_R,0.10,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,약한 호감
+Listening,expression,Expression,Cheek_Raise_L,0.05,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,미세한 부드러움
+Listening,expression,Expression,Cheek_Raise_R,0.05,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,미세한 부드러움
+Friendly,expression,Expression,Mouth_Smile_L,0.35,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,친근한 미소
+Friendly,expression,Expression,Mouth_Smile_R,0.35,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,친근한 미소
+Friendly,expression,Expression,Cheek_Raise_L,0.22,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,웃음 보조
+Friendly,expression,Expression,Cheek_Raise_R,0.22,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,웃음 보조
+Friendly,expression,Expression,Eye_Squint_L,0.10,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,눈웃음 약하게
+Friendly,expression,Expression,Eye_Squint_R,0.10,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,눈웃음 약하게
+Friendly,expression,Expression,Mouth_Dimple_L,0.10,0.00,1.00,30,0.18,0.28,Additive,Mouth_Dimple,0.70,1.00,보조개/입꼬리 보조
+Friendly,expression,Expression,Mouth_Dimple_R,0.10,0.00,1.00,30,0.18,0.28,Additive,Mouth_Dimple,0.70,1.00,보조개/입꼬리 보조
+Happy,expression,Expression,Mouth_Smile_L,0.55,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,명확한 미소
+Happy,expression,Expression,Mouth_Smile_R,0.55,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,명확한 미소
+Happy,expression,Expression,Cheek_Raise_L,0.40,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,웃을 때 볼 상승
+Happy,expression,Expression,Cheek_Raise_R,0.40,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,웃을 때 볼 상승
+Happy,expression,Expression,Eye_Squint_L,0.18,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,눈웃음
+Happy,expression,Expression,Eye_Squint_R,0.18,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,눈웃음
+Happy,expression,Expression,Nose_Crease_L,0.08,0.00,1.00,30,0.18,0.28,Additive,Nose_Crease,1.00,1.00,웃음 주름 보조
+Happy,expression,Expression,Nose_Crease_R,0.08,0.00,1.00,30,0.18,0.28,Additive,Nose_Crease,1.00,1.00,웃음 주름 보조
+Happy,expression,Expression,Mouth_Dimple_L,0.16,0.00,1.00,30,0.18,0.28,Additive,Mouth_Dimple,0.70,1.00,웃음 디테일
+Happy,expression,Expression,Mouth_Dimple_R,0.16,0.00,1.00,30,0.18,0.28,Additive,Mouth_Dimple,0.70,1.00,웃음 디테일
+Thinking,expression,Expression,Brow_Compress_L,0.24,0.00,1.00,30,0.18,0.28,Additive,Brow_Compress,1.00,1.00,생각중 눈썹 모음
+Thinking,expression,Expression,Brow_Compress_R,0.24,0.00,1.00,30,0.18,0.28,Additive,Brow_Compress,1.00,1.00,생각중 눈썹 모음
+Thinking,expression,Expression,Brow_Raise_Inner_L,0.22,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,고민 느낌
+Thinking,expression,Expression,Brow_Raise_Inner_R,0.22,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,고민 느낌
+Thinking,expression,Expression,Eye_Squint_L,0.12,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,집중
+Thinking,expression,Expression,Eye_Squint_R,0.12,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,집중
+Thinking,expression,Expression,Mouth_Tighten_L,0.28,0.00,1.00,30,0.18,0.28,Additive,Mouth_Tighten,0.70,1.00,입술 조임
+Thinking,expression,Expression,Mouth_Tighten_R,0.28,0.00,1.00,30,0.18,0.28,Additive,Mouth_Tighten,0.70,1.00,입술 조임
+Thinking,expression,Expression,Mouth_Press_L,0.20,0.00,1.00,30,0.18,0.28,Additive,Mouth_Press,0.70,1.00,생각중 입 다묾
+Thinking,expression,Expression,Mouth_Press_R,0.20,0.00,1.00,30,0.18,0.28,Additive,Mouth_Press,0.70,1.00,생각중 입 다묾
+Thinking,expression,Expression,Cheek_Suck_L,0.08,0.00,1.00,30,0.18,0.28,Additive,Cheek_Suck,1.00,1.00,고민 보조
+Thinking,expression,Expression,Cheek_Suck_R,0.08,0.00,1.00,30,0.18,0.28,Additive,Cheek_Suck,1.00,1.00,고민 보조
+Curious,expression,Expression,Brow_Raise_Outer_L,0.22,0.00,1.00,30,0.18,0.28,Additive,Browaise_Outer,1.00,1.00,호기심 눈썹
+Curious,expression,Expression,Brow_Raise_Outer_R,0.22,0.00,1.00,30,0.18,0.28,Additive,Browaise_Outer,1.00,1.00,호기심 눈썹
+Curious,expression,Expression,Brow_Raise_Inner_L,0.12,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,관심
+Curious,expression,Expression,Brow_Raise_Inner_R,0.12,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,관심
+Curious,expression,Expression,Eye_Wide_L,0.18,0.00,1.00,30,0.18,0.28,Additive,Eye_Wide,1.00,1.00,눈 크게
+Curious,expression,Expression,Eye_Wide_R,0.18,0.00,1.00,30,0.18,0.28,Additive,Eye_Wide,1.00,1.00,눈 크게
+Curious,expression,Expression,Mouth_Smile_L,0.12,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,약한 미소
+Curious,expression,Expression,Mouth_Smile_R,0.12,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,약한 미소
+Curious,expression,Expression,Mouth_Shrug_Upper,0.08,0.00,1.00,30,0.18,0.28,Additive,Mouth_Shrug_Upper,0.70,1.00,약간 애매함
+Concerned,expression,Expression,Brow_Raise_Inner_L,0.45,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,걱정 눈썹
+Concerned,expression,Expression,Brow_Raise_Inner_R,0.45,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,걱정 눈썹
+Concerned,expression,Expression,Brow_Drop_L,0.18,0.00,1.00,30,0.18,0.28,Additive,Brow_Drop,1.00,1.00,눈썹 하강
+Concerned,expression,Expression,Brow_Drop_R,0.18,0.00,1.00,30,0.18,0.28,Additive,Brow_Drop,1.00,1.00,눈썹 하강
+Concerned,expression,Expression,Mouth_Frown_L,0.28,0.00,1.00,30,0.18,0.28,Additive,Mouth_Frown,0.70,1.00,입꼬리 내려감
+Concerned,expression,Expression,Mouth_Frown_R,0.28,0.00,1.00,30,0.18,0.28,Additive,Mouth_Frown,0.70,1.00,입꼬리 내려감
+Concerned,expression,Expression,Mouth_Stretch_L,0.12,0.00,1.00,30,0.18,0.28,Additive,Mouth_Stretch,0.70,1.00,긴장
+Concerned,expression,Expression,Mouth_Stretch_R,0.12,0.00,1.00,30,0.18,0.28,Additive,Mouth_Stretch,0.70,1.00,긴장
+Concerned,expression,Expression,Eye_Squint_L,0.06,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,걱정 보조
+Concerned,expression,Expression,Eye_Squint_R,0.06,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,걱정 보조
+Uncertain,expression,Expression,Brow_Raise_Inner_L,0.20,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,애매함
+Uncertain,expression,Expression,Brow_Raise_Inner_R,0.20,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,애매함
+Uncertain,expression,Expression,Brow_Compress_L,0.14,0.00,1.00,30,0.18,0.28,Additive,Brow_Compress,1.00,1.00,약한 고민
+Uncertain,expression,Expression,Brow_Compress_R,0.14,0.00,1.00,30,0.18,0.28,Additive,Brow_Compress,1.00,1.00,약한 고민
+Uncertain,expression,Expression,Mouth_Shrug_Upper,0.18,0.00,1.00,30,0.18,0.28,Additive,Mouth_Shrug_Upper,0.70,1.00,입술 으쓱
+Uncertain,expression,Expression,Mouth_Shrug_Lower,0.16,0.00,1.00,30,0.18,0.28,Additive,Mouth_Shrugower,0.70,1.00,입술 으쓱
+Uncertain,expression,Expression,Mouth_Stretch_L,0.16,0.00,1.00,30,0.18,0.28,Additive,Mouth_Stretch,0.70,1.00,어색함
+Uncertain,expression,Expression,Mouth_Stretch_R,0.16,0.00,1.00,30,0.18,0.28,Additive,Mouth_Stretch,0.70,1.00,어색함
+Uncertain,expression,Expression,Cheek_Suck_L,0.08,0.00,1.00,30,0.18,0.28,Additive,Cheek_Suck,1.00,1.00,불확실함 보조
+Uncertain,expression,Expression,Cheek_Suck_R,0.08,0.00,1.00,30,0.18,0.28,Additive,Cheek_Suck,1.00,1.00,불확실함 보조
+Apologetic,expression,Expression,Brow_Raise_Inner_L,0.32,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,미안한 표정
+Apologetic,expression,Expression,Brow_Raise_Inner_R,0.32,0.00,1.00,30,0.18,0.28,Additive,Browaise_Inner,1.00,1.00,미안한 표정
+Apologetic,expression,Expression,Brow_Drop_L,0.20,0.00,1.00,30,0.18,0.28,Additive,Brow_Drop,1.00,1.00,눈썹 아래
+Apologetic,expression,Expression,Brow_Drop_R,0.20,0.00,1.00,30,0.18,0.28,Additive,Brow_Drop,1.00,1.00,눈썹 아래
+Apologetic,expression,Expression,Mouth_Frown_L,0.20,0.00,1.00,30,0.18,0.28,Additive,Mouth_Frown,0.70,1.00,미안한 입꼬리
+Apologetic,expression,Expression,Mouth_Frown_R,0.20,0.00,1.00,30,0.18,0.28,Additive,Mouth_Frown,0.70,1.00,미안한 입꼬리
+Apologetic,expression,Expression,Mouth_Press_L,0.12,0.00,1.00,30,0.18,0.28,Additive,Mouth_Press,0.70,1.00,입술 다묾
+Apologetic,expression,Expression,Mouth_Press_R,0.12,0.00,1.00,30,0.18,0.28,Additive,Mouth_Press,0.70,1.00,입술 다묾
+Apologetic,expression,Expression,Eye_Squint_L,0.08,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,조심스러운 눈
+Apologetic,expression,Expression,Eye_Squint_R,0.08,0.00,1.00,30,0.18,0.28,Additive,Eye_Squint,1.00,1.00,조심스러운 눈
+Surprised,expression,Expression,Brow_Raise_Outer_L,0.50,0.00,1.00,30,0.08,0.22,Additive,Browaise_Outer,1.00,1.00,놀람 눈썹 바깥
+Surprised,expression,Expression,Brow_Raise_Outer_R,0.50,0.00,1.00,30,0.08,0.22,Additive,Browaise_Outer,1.00,1.00,놀람 눈썹 바깥
+Surprised,expression,Expression,Brow_Raise_Inner_L,0.35,0.00,1.00,30,0.08,0.22,Additive,Browaise_Inner,1.00,1.00,놀람 눈썹 안쪽
+Surprised,expression,Expression,Brow_Raise_Inner_R,0.35,0.00,1.00,30,0.08,0.22,Additive,Browaise_Inner,1.00,1.00,놀람 눈썹 안쪽
+Surprised,expression,Expression,Eye_Wide_L,0.45,0.00,1.00,30,0.08,0.22,Additive,Eye_Wide,1.00,1.00,눈 크게
+Surprised,expression,Expression,Eye_Wide_R,0.45,0.00,1.00,30,0.08,0.22,Additive,Eye_Wide,1.00,1.00,눈 크게
+Surprised,expression,Expression,Jaw_Open,0.18,0.00,1.00,30,0.08,0.22,Additive,Jaw_Open,0.70,1.00,약한 입 벌림
+Surprised,expression,Expression,Mouth_Shrug_Lower,0.10,0.00,1.00,30,0.08,0.22,Additive,Mouth_Shrugower,0.70,1.00,입 아래 보조
+Explaining,expression,Expression,Brow_Raise_Outer_L,0.16,0.00,1.00,30,0.18,0.28,Additive,Browaise_Outer,1.00,1.00,설명할 때 눈썹
+Explaining,expression,Expression,Brow_Raise_Outer_R,0.16,0.00,1.00,30,0.18,0.28,Additive,Browaise_Outer,1.00,1.00,설명할 때 눈썹
+Explaining,expression,Expression,Eye_Wide_L,0.10,0.00,1.00,30,0.18,0.28,Additive,Eye_Wide,1.00,1.00,주의 환기
+Explaining,expression,Expression,Eye_Wide_R,0.10,0.00,1.00,30,0.18,0.28,Additive,Eye_Wide,1.00,1.00,주의 환기
+Explaining,expression,Expression,Mouth_Smile_L,0.18,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,부드러운 설명
+Explaining,expression,Expression,Mouth_Smile_R,0.18,0.00,1.00,30,0.18,0.28,Additive,Mouth_Smile,0.70,1.00,부드러운 설명
+Explaining,expression,Expression,Cheek_Raise_L,0.08,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,부드러움
+Explaining,expression,Expression,Cheek_Raise_R,0.08,0.00,1.00,30,0.18,0.28,Additive,Cheekaise,1.00,1.00,부드러움
+Blink_Both,idle,IdleBlink,Eye_Blink_L,1.00,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Both,idle,IdleBlink,Eye_Blink_R,1.00,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Both,idle,IdleBlink,Eyelash_Upper_Down_L,0.45,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Both,idle,IdleBlink,Eyelash_Upper_Down_R,0.45,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Left,idle,IdleBlink,Eye_Blink_L,1.00,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Left,idle,IdleBlink,Eyelash_Upper_Down_L,0.45,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Right,idle,IdleBlink,Eye_Blink_R,1.00,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Blink_Right,idle,IdleBlink,Eyelash_Upper_Down_R,0.45,0.00,1.00,60,0.04,0.08,Override,Eye_Blink,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Micro_Squint,idle,IdleBlink,Eye_Squint_L,0.08,0.00,1.00,60,0.04,0.08,Additive,Eye_Squint,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Micro_Squint,idle,IdleBlink,Eye_Squint_R,0.08,0.00,1.00,60,0.04,0.08,Additive,Eye_Squint,1.00,1.00,자동 눈깜빡임/미세 눈 움직임용
+Gaze_Left,gaze,Gaze,Eye_L_Look_L,0.45,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Left,gaze,Gaze,Eye_R_Look_L,0.45,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Right,gaze,Gaze,Eye_L_Look_R,0.45,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Right,gaze,Gaze,Eye_R_Look_R,0.45,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Up,gaze,Gaze,Eye_L_Look_Up,0.35,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Up,gaze,Gaze,Eye_R_Look_Up,0.35,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Down,gaze,Gaze,Eye_L_Look_Down,0.35,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_Down,gaze,Gaze,Eye_R_Look_Down,0.35,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_User,gaze,Gaze,Eye_L_Look_L,0.00,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Gaze_User,gaze,Gaze,Eye_R_Look_R,0.00,0.00,0.65,50,0.10,0.18,Override,GazeDirection,1.00,1.00,시선 제어. 가능하면 eye bone 회전을 우선하고 morph는 보조로 사용
+Jaw_Relaxed,jaw,Jaw,Jaw_Open,0.04,0.00,1.00,70,0.06,0.10,Override,JawMouth,1.00,1.00,립싱크 전후 입 열림/닫힘 보정
+Jaw_Relaxed,jaw,Jaw,Mouth_Close,0.00,0.00,1.00,70,0.06,0.10,Override,JawMouth,1.00,1.00,립싱크 전후 입 열림/닫힘 보정
+Jaw_SmallOpen,jaw,Jaw,Jaw_Open,0.12,0.00,1.00,70,0.06,0.10,Override,JawMouth,1.00,1.00,립싱크 전후 입 열림/닫힘 보정
+Jaw_SmallOpen,jaw,Jaw,Mouth_Close,0.00,0.00,1.00,70,0.06,0.10,Override,JawMouth,1.00,1.00,립싱크 전후 입 열림/닫힘 보정
+Mouth_Closed,jaw,Jaw,Mouth_Close,0.55,0.00,1.00,70,0.06,0.10,Override,JawMouth,1.00,1.00,립싱크 전후 입 열림/닫힘 보정
+Mouth_Closed,jaw,Jaw,Jaw_Open,0.00,0.00,1.00,70,0.06,0.10,Override,JawMouth,1.00,1.00,립싱크 전후 입 열림/닫힘 보정
+Viseme_AA_AH,viseme,LipSync,V_Open,0.75,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_AA_AH,viseme,LipSync,V_Lip_Open,0.40,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_AA_AH,viseme,LipSync,Jaw_Open,0.42,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_EH_AE,viseme,LipSync,V_Wide,0.65,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_EH_AE,viseme,LipSync,V_Lip_Open,0.35,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_EH_AE,viseme,LipSync,Jaw_Open,0.25,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_OH_OW,viseme,LipSync,V_Tight_O,0.70,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_OH_OW,viseme,LipSync,V_Tight,0.35,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_OH_OW,viseme,LipSync,Jaw_Open,0.20,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_UW_OO,viseme,LipSync,V_Tight,0.70,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_UW_OO,viseme,LipSync,V_Tight_O,0.45,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_UW_OO,viseme,LipSync,Jaw_Open,0.14,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_FV,viseme,LipSync,V_Dental_Lip,0.80,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_FV,viseme,LipSync,Mouth_Close,0.35,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_PBM,viseme,LipSync,V_Explosive,0.75,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_PBM,viseme,LipSync,Mouth_Close,0.70,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_PBM,viseme,LipSync,Jaw_Open,0.00,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_CH_J,viseme,LipSync,V_Affricate,0.70,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_CH_J,viseme,LipSync,V_Lip_Open,0.30,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_CH_J,viseme,LipSync,Jaw_Open,0.18,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_TH,viseme,LipSync,V_Tongue_Out,0.65,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_TH,viseme,LipSync,V_Lip_Open,0.25,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_TH,viseme,LipSync,Jaw_Open,0.16,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_L_N,viseme,LipSync,V_Tongue_Raise,0.60,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_L_N,viseme,LipSync,V_Lip_Open,0.25,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_L_N,viseme,LipSync,Jaw_Open,0.12,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_S_Z,viseme,LipSync,V_Tongue_Narrow,0.55,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_S_Z,viseme,LipSync,V_Tight,0.25,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_S_Z,viseme,LipSync,Jaw_Open,0.08,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_R,viseme,LipSync,V_Tongue_up,0.45,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_R,viseme,LipSync,V_Tight,0.20,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_R,viseme,LipSync,Jaw_Open,0.10,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_Rest,viseme,LipSync,V_Open,0.00,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_Rest,viseme,LipSync,V_Lip_Open,0.00,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_Rest,viseme,LipSync,V_Wide,0.00,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_Rest,viseme,LipSync,V_Tight,0.00,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_Rest,viseme,LipSync,V_Tight_O,0.00,0.00,1.00,90,0.03,0.06,Override,LipSyncViseme,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Viseme_Rest,viseme,LipSync,Jaw_Open,0.00,0.00,1.00,90,0.03,0.06,Override,JawMouth,1.00,1.00,TTS/음성 분석 결과의 viseme 이벤트에서 사용
+Head_SmallNod,head,HeadMotion,Head_Forward,0.08,0.00,1.00,40,0.18,0.25,Additive,HeadMotion,1.00,1.00,MVP에서는 bone 회전 우선. morph는 보조
+Head_SmallNod,head,HeadMotion,Head_Turn_Down,0.06,0.00,1.00,40,0.18,0.25,Additive,HeadMotion,1.00,1.00,MVP에서는 bone 회전 우선. morph는 보조
+Head_Tilt_Left,head,HeadMotion,Head_Tilt_L,0.10,0.00,1.00,40,0.18,0.25,Additive,HeadMotion,1.00,1.00,MVP에서는 bone 회전 우선. morph는 보조
+Head_Tilt_Right,head,HeadMotion,Head_Tilt_R,0.10,0.00,1.00,40,0.18,0.25,Additive,HeadMotion,1.00,1.00,MVP에서는 bone 회전 우선. morph는 보조

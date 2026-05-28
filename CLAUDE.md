@@ -91,11 +91,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
   - 병렬 처리 가능한 작업(TTS 생성 + LLM 스트리밍 등)은 설계 단계에서 분리해둘 것.
   - 람다/콜백 내 UObject 참조는 반드시 TWeakObjectPtr로 캡처해 GC 안전성 확보.
 
-## 프로젝트 개요
-
-전시 관람객이 모바일 패널로 UE5 캐릭터를 실시간 조종하는 인터랙티브 전시 시스템.
-
-**파이프라인:** 모바일 브라우저 → ASP.NET SignalR 서버 → UE5 클라이언트
 
 ---
 
@@ -144,55 +139,6 @@ InteractiveExhibition/
 ```
 
 ---
-
-## 핵심 파일
-
-| 역할 | 경로 |
-|------|------|
-| SignalR Hub | `Server-AspNet/ExhibitionServer/Realtime/ExhibitionHub.cs` |
-| UE WebSocket 미들웨어 | `Server-AspNet/ExhibitionServer/Realtime/UnrealWebSocketMiddleware.cs` |
-| UE 연결 매니저 | `Server-AspNet/ExhibitionServer/Realtime/UnrealConnectionManager.cs` |
-| 채팅 서비스 (RAG + 명령 디스패치) | `Server-AspNet/ExhibitionServer/Application/Chat/ChatGuideService.cs` |
-| AI Gateway HTTP 클라이언트 | `Server-AspNet/ExhibitionServer/Application/Chat/AiGatewayClient.cs` |
-| 전시물 지식 베이스 | `Server-AspNet/ExhibitionServer/Application/Knowledge/ExhibitionKnowledgeStore.cs` |
-| 전시물 JSON 데이터 | `Server-AspNet/ExhibitionServer/Data/ExhibitionKnowledge/` |
-| OpenAI 응답 프로바이더 + 프롬프트 | `Cloud-AI-Gateway/ExhibitionAiGateway/Providers/OpenAI/OpenAiResponsesProvider.cs` |
-| Embedding Rerank | `Cloud-AI-Gateway/ExhibitionAiGateway/Application/Rag/EmbeddingRetrievedContextRanker.cs` |
-| UE 리얼타임 서브시스템 | `Client-Unreal/ExhibitionClient/Source/ExhibitionClient/Public/Realtime/ExhibitionRealtimeSubsystem.h` |
-| UE HUD 위젯 | `Client-Unreal/ExhibitionClient/Source/ExhibitionClient/Public/UI/ExhibitionHudWidget.h` |
-| UE HUD 매니저 | `Client-Unreal/ExhibitionClient/Source/ExhibitionClient/Public/UI/ExhibitionHudManager.h` |
-| 모바일 패널 진입점 | `Mobile-Panel/src/panels/exhibition/ExhibitionPanel.tsx` |
-| SignalR 트랜스포트 | `Mobile-Panel/src/core/transport/SignalRTransport.ts` |
-
----
-
-## 각 컴포넌트 실행 방법
-
-### Mobile-Panel (React + Vite)
-```bash
-cd Mobile-Panel
-npm install          # 최초 1회
-npm run dev          # 개발 서버: http://0.0.0.0:3001
-npm run build        # 빌드 → dist/
-```
-
-### Server-AspNet (로컬 서버 — UE와 함께 실행)
-```bash
-cd Server-AspNet/ExhibitionServer
-dotnet run                          # 개발: http://localhost:5225
-dotnet run --launch-profile https   # HTTPS
-dotnet publish -c Release -r win-x64 --self-contained  # Steam 배포용 빌드
-# 설정: appsettings.json → AiGatewayUrl, WebSocket 포트 등
-```
-
-### Cloud-AI-Gateway (클라우드 배포)
-```bash
-cd Cloud-AI-Gateway/ExhibitionAiGateway
-dotnet run                          # 개발: http://localhost:5100
-dotnet publish -c Release           # 배포용 빌드
-# 필수 환경변수: OpenAI__ApiKey, Gateway__ApiKey
-# 설정: appsettings.Production.json
-```
 
 ### Client-Unreal (UE5)
 - Visual Studio 2022로 `Client-Unreal/ExhibitionClient/ExhibitionClient.sln` 열어서 빌드

@@ -63,6 +63,11 @@ class SceneContext(BaseModel):
     model_config = {"populate_by_name": True}
 
 
+class RuntimeConversationTurn(BaseModel):
+    role: str = Field(..., pattern="^(user|assistant)$")
+    content: str = Field(..., min_length=1)
+
+
 class BehaviorJson(BaseModel):
     emotion: RuntimeEmotion = RuntimeEmotion.FRIENDLY
     intensity: float = Field(0.6, ge=0.0, le=1.0)
