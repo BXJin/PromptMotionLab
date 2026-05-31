@@ -1142,6 +1142,35 @@ def test_runtime_service_applies_repeated_emotional_scenario_hint() -> None:
     assert result.behavior.confidence <= 0.72
 
 
+def test_runtime_service_resets_repeated_emotional_scenario_after_topic_change() -> None:
+    seen_messages: list[str] = []
+
+    class ScenarioProvider(RuntimeBehaviorProvider):
+        async def respond(
+            self,
+            message: str,
+            scene_context: SceneContext,
+            character_id: str,
+            conversation_history: list | None = None,
+            character_profile: object | None = None,
+        ) -> tuple[str, BehaviorJson]:
+            del scene_context, character_id, conversation_history, character_profile
+            seen_messages.append(message)
+            return "ok", BehaviorJson(emotion="friendly", intent="answer", intensity=0.4, confidence=0.9)
+
+    service = RuntimeCharacterService(primary_provider=ScenarioProvider())
+
+    asyncio.run(service.respond("I feel sad today.", SceneContext(), "default_girl", session_id="scenario_reset"))
+    asyncio.run(service.respond("I watched a movie.", SceneContext(), "default_girl", session_id="scenario_reset"))
+    result = asyncio.run(
+        service.respond("I feel lonely again.", SceneContext(), "default_girl", session_id="scenario_reset")
+    )
+
+    assert seen_messages[-1] == "I feel lonely again."
+    assert result.behavior.emotion == "concerned"
+    assert result.behavior.intensity < 0.62
+
+
 def test_runtime_service_uses_shared_emotional_keywords_for_guard_and_scenario() -> None:
     seen_messages: list[str] = []
 
@@ -1232,30 +1261,42 @@ def test_runtime_service_passes_minimal_character_profile_to_provider() -> None:
 
     service = RuntimeCharacterService(primary_provider=ProfileProvider())
 
-    result = asyncio.run(service.respond("profile provider check", SceneContext(), "default_girl"))
+    result = asyncio.run(service.respond("profile provider check", SceneContext(), "airi"))
 
-    assert seen_profile_ids == ["default_girl"]
-    assert result.behavior.intensity == 0.9
+    assert seen_profile_ids == ["airi"]
+    assert result.behavior.intensity == 0.92
 
 
-def test_character_profile_store_contains_eight_personality_presets() -> None:
+def test_character_profile_store_contains_airi_personality_presets() -> None:
     store = CharacterProfileStore()
-    expected_ids = ["e_f_n", "e_f_s", "e_t_n", "e_t_s", "i_f_n", "i_f_s", "i_t_n", "i_t_s"]
+    expected_ids = [
+        "airi_bright",
+        "airi_cheerful",
+        "airi_idea",
+        "airi_direct",
+        "airi_soft",
+        "airi_calm",
+        "airi_reflective",
+        "airi_practical",
+    ]
 
     profiles = [store.get(character_id) for character_id in expected_ids]
 
     assert [profile.character_id for profile in profiles] == expected_ids
-    assert store.get("e_f_n").energy > store.get("i_f_n").energy
-    assert store.get("e_f_n").empathy > store.get("e_t_n").empathy
-    assert store.get("e_f_n").imagination > store.get("e_f_s").imagination
-    assert store.get("e_f_n").playfulness >= 0.67
+    assert store.get("airi_bright").energy > store.get("airi_soft").energy
+    assert store.get("airi_bright").empathy > store.get("airi_idea").empathy
+    assert store.get("airi_bright").imagination > store.get("airi_cheerful").imagination
+    assert store.get("airi_bright").playfulness >= 0.67
+    assert store.get("default_girl").character_id == "airi"
+    assert store.get("e_t_s").character_id == "airi_direct"
 
 
 def test_profile_prompt_builder_maps_profile_values_to_natural_language() -> None:
-    profile = CharacterProfileStore().get("i_t_s")
+    profile = CharacterProfileStore().get("airi_practical")
 
     prompt = ProfilePromptBuilder.build(profile)
 
+    assert "Airi is one consistent realtime 3D AI companion" in prompt
     assert "Stay calm" in prompt
     assert "Prioritize clear reasoning" in prompt
     assert "Prefer concrete" in prompt
@@ -1264,17 +1305,40 @@ def test_profile_prompt_builder_maps_profile_values_to_natural_language() -> Non
     assert "0.18" not in prompt
 
 
+def test_profile_prompt_builder_examples_are_not_mojibake() -> None:
+    store = CharacterProfileStore()
+
+    for character_id in ["airi", "airi_direct", "airi_soft", "airi_practical"]:
+        prompt = ProfilePromptBuilder.build(store.get(character_id))
+        suspicious = {character for character in prompt if 0x00C0 <= ord(character) <= 0x024F or character == "\ufffd"}
+
+        assert suspicious == set()
+
+
 def test_openai_provider_uses_character_voice_prompt_not_raw_profile_json() -> None:
     provider = OpenAiRuntimeBehaviorProvider(api_key="test", model="test")
-    profile = CharacterProfileStore().get("e_f_n")
+    profile = CharacterProfileStore().get("airi_bright")
+    instructions = provider._build_instructions(profile)
 
     prompt = provider._build_input("안녕", SceneContext(), "e_f_n", [], profile)
 
-    assert "characterVoice:" in prompt
-    assert "Use bright, lively reactions" in prompt
-    assert "playful teasing" in prompt
-    assert "characterProfile:" not in prompt
-    assert "emotionIntensityScale" not in prompt
+    assert "Character voice:" in instructions
+    assert "Use bright, lively reactions" in instructions
+    assert "playful teasing" in instructions
+    assert "Good response examples:" in instructions
+    assert "characterVoice:" not in prompt
+    assert "characterProfile:" not in instructions
+    assert "emotionIntensityScale" not in instructions
+
+
+def test_openai_provider_instructions_include_character_chat_guardrails() -> None:
+    provider = OpenAiRuntimeBehaviorProvider(api_key="test", model="test")
+
+    instructions = provider._build_instructions(CharacterProfileStore().get("airi_direct"))
+
+    assert "at most two short questions" in instructions
+    assert "never guess names or rankings" in instructions
+    assert "service-desk endings" in instructions
 
 
 def test_openai_provider_extracts_json_object_from_extra_text() -> None:
@@ -1315,6 +1379,31 @@ def test_openai_provider_normalizes_common_behavior_enum_aliases() -> None:
         '"gestureKey":"none","headMotion":"none","ttsStyle":"friendly"}}'
     )
     assert voice_alias_behavior.tts_style == "warm"
+
+
+def test_openai_provider_removes_generic_assistant_closer() -> None:
+    provider = OpenAiRuntimeBehaviorProvider(api_key="test", model="test")
+
+    reply, behavior = provider._parse_model_output(
+        '{"reply":"\\ucc9c\\ub9cc\\uc5d0! \\uc5b8\\uc81c\\ub4e0 \\ub9d0\\ud574.",'
+        '"behavior":{"emotion":"friendly","intent":"answer","gaze":"user",'
+        '"gestureKey":"none","headMotion":"none","ttsStyle":"warm"}}'
+    )
+
+    assert reply == "\ucc9c\ub9cc\uc5d0!"
+    assert behavior.emotion == "friendly"
+
+
+def test_openai_provider_keeps_at_most_two_questions() -> None:
+    provider = OpenAiRuntimeBehaviorProvider(api_key="test", model="test")
+
+    reply, _ = provider._parse_model_output(
+        '{"reply":"\\uc601\\ud654 \\uc5b4\\ub560\\uc5b4? \\ubb50 \\ubd24\\uc5b4? \\ub204\\uad6c\\ub791 \\uac14\\uc5b4?",'
+        '"behavior":{"emotion":"friendly","intent":"answer","gaze":"user",'
+        '"gestureKey":"none","headMotion":"none","ttsStyle":"warm"}}'
+    )
+
+    assert reply == "\uc601\ud654 \uc5b4\ub560\uc5b4? \ubb50 \ubd24\uc5b4?"
 
 
 def test_openai_provider_ignores_extra_closing_brace_after_json() -> None:

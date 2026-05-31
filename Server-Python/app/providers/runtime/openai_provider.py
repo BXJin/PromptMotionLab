@@ -1,6 +1,7 @@
 import json
 import logging
 import asyncio
+import re
 from typing import Any
 
 import httpx
@@ -58,13 +59,12 @@ class OpenAiRuntimeBehaviorProvider(RuntimeBehaviorProvider):
     ) -> tuple[str, BehaviorJson]:
         payload = {
             "model": self._model,
-            "instructions": self._build_instructions(),
+            "instructions": self._build_instructions(character_profile),
             "input": self._build_input(
                 message,
                 scene_context,
                 character_id,
                 conversation_history or [],
-                character_profile,
             ),
             "max_output_tokens": self._max_output_tokens,
         }
@@ -96,8 +96,8 @@ class OpenAiRuntimeBehaviorProvider(RuntimeBehaviorProvider):
             )
         return self._client
 
-    def _build_instructions(self) -> str:
-        return (
+    def _build_instructions(self, character_profile: CharacterProfile | None = None) -> str:
+        instructions = (
             "You drive a real-time 3D character. Return only compact JSON, no markdown.\n"
             "Reply in the user's language.\n"
             "Default reply: 1 short sentence, under 25 words. Use 2 sentences only if needed. "
@@ -116,8 +116,20 @@ class OpenAiRuntimeBehaviorProvider(RuntimeBehaviorProvider):
             "- For analysis, explanation, comparison, or why/how questions, use emotion=thinking unless the user emotion is stronger.\n"
             "- Do not answer every clause separately; compress the response like natural conversation.\n"
             "- Do not always end with a question.\n"
+            "- Use at most two short questions in a reply. Two questions are allowed for gentle emotional support; avoid interview-style question chains.\n"
+            "- When asking a follow-up, choose it from the user's latest concrete topic, feeling, or implied next step. "
+            "Do not ask a generic follow-up when a more specific one is available.\n"
+            "- Prefer follow-up questions that advance the same conversation thread: ask about the scene, reason, choice, feeling, or next action the user just mentioned.\n"
+            "- If the user shares an experience, ask about the most vivid detail or emotional aftertaste, not a broad survey question.\n"
+            "- If the user asks for advice, ask only for the missing constraint that changes the answer; otherwise give the next practical step.\n"
+            "- If the user sounds sad, tired, lonely, angry, or anxious, first react to that feeling, then ask one gentle specific question only if it helps.\n"
+            "- Avoid generic assistant endings such as 'if you need anything else', 'feel free to ask', or 'I am here to help'.\n"
+            "- In Korean casual character modes, avoid formal service-desk endings and customer-support phrasing.\n"
+            "- Never close with generic availability phrases. End on the useful answer instead.\n"
             "- Do not invent realtime facts such as weather, news, or prices. Say you cannot check live information yet.\n"
-            "- For realtime data, do not add guesses, probabilities, seasonal averages, or general claims. Only say you cannot check it yet.\n"
+            "- For realtime, latest, trending, ranking, current game, news, weather, price, or schedule questions, never guess names or rankings. "
+            "Say you cannot check live information yet, then offer a stable way to choose or compare.\n"
+            "- For realtime data, do not add guesses, probabilities, seasonal averages, examples, or general claims. Only say you cannot check it yet.\n"
             "- For sadness, worry, loneliness, or apology, use concerned/apologetic and careful/warm style.\n"
             "- For uncertainty, use emotion=uncertain and confidence < 0.55.\n"
             "- For focused object explanation, use gaze=focused_object and explain_small or point_soft.\n"
@@ -129,6 +141,9 @@ class OpenAiRuntimeBehaviorProvider(RuntimeBehaviorProvider):
             "- behavior.ttsStyle must be exactly one of: neutral, warm, careful, energetic.\n"
             "- No morphs, visemes, bones, frame data, or extra fields."
         )
+        if character_profile:
+            instructions += f"\n\nCharacter voice:\n{ProfilePromptBuilder.build(character_profile)}"
+        return instructions
 
     def _build_input(
         self,
@@ -136,16 +151,14 @@ class OpenAiRuntimeBehaviorProvider(RuntimeBehaviorProvider):
         scene_context: SceneContext,
         character_id: str,
         conversation_history: list[RuntimeConversationTurn],
-        character_profile: CharacterProfile | None,
+        character_profile: CharacterProfile | None = None,
     ) -> str:
+        del character_profile
         context_json = scene_context.model_dump(by_alias=True, exclude_none=True)
         lines = [
             f"characterId:{character_id}",
             f"sceneContext:{json.dumps(context_json, ensure_ascii=False, separators=(',', ':'))}",
         ]
-
-        if character_profile:
-            lines.append(f"characterVoice:{ProfilePromptBuilder.build(character_profile)}")
 
         history = conversation_history[-self._max_history_turns :]
         if history:
@@ -212,7 +225,61 @@ class OpenAiRuntimeBehaviorProvider(RuntimeBehaviorProvider):
             )
             raise ValueError(f"Invalid behavior JSON: {exc}") from exc
 
-        return reply.strip(), behavior
+        return self._polish_reply(reply.strip()), behavior
+
+    def _polish_reply(self, reply: str) -> str:
+        original = reply.strip()
+        if not original:
+            return original
+
+        text = self._keep_at_most_two_questions(original)
+        text = self._remove_generic_assistant_closers(text)
+        return text.strip() or original
+
+    def _keep_at_most_two_questions(self, reply: str) -> str:
+        question_positions = [index for index, character in enumerate(reply) if character in {"?", "\uff1f"}]
+        if len(question_positions) <= 2:
+            return reply
+        return reply[: question_positions[1] + 1].strip()
+
+    def _remove_generic_assistant_closers(self, reply: str) -> str:
+        generic_phrases = (
+            "\uc5b8\uc81c\ub4e0 \ub9d0\ud574",
+            "\uc5b8\uc81c\ub4e0 \uc774\uc57c\uae30",
+            "\ub3c4\uc6c0\uc774 \ud544\uc694\ud558\uba74",
+            "\ub354 \ud544\uc694\ud558\uba74",
+            "\ud544\uc694\ud558\uba74 \uc5b8\uc81c\ub4e0",
+            "\ud3b8\ud558\uac8c \ub9d0",
+            "\ub09c \uc5ec\uae30 \uc788\uc744\uac8c",
+            "\uacc1\uc5d0 \uc788\uc744\uac8c",
+            "feel free",
+            "anything else",
+            "i am here to help",
+        )
+
+        parts = re.split(r"(?<=[.!?])\s+", reply)
+        cleaned: list[str] = []
+        for part in parts:
+            trimmed = part.strip()
+            if not trimmed:
+                continue
+
+            lowered = trimmed.lower()
+            matches = [
+                index
+                for phrase in generic_phrases
+                for index in [lowered.find(phrase.lower())]
+                if index >= 0
+            ]
+            if not matches:
+                cleaned.append(trimmed)
+                continue
+
+            prefix = trimmed[: min(matches)].rstrip(" ,.!?\uff0c")
+            if prefix:
+                cleaned.append(prefix)
+
+        return " ".join(cleaned)
 
     def _normalize_behavior_data(self, behavior_data: dict[str, Any]) -> list[str]:
         notes: list[str] = []

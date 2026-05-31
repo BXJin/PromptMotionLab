@@ -81,7 +81,7 @@ public:
 
     /** 캐릭터 식별자 */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PromptMotion|Config")
-    FString CharacterId = TEXT("default_girl");
+    FString CharacterId = TEXT("airi");
 
     /** Face/lip-sync CSV config id. Personality presets can share one character rig config. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PromptMotion|Config")

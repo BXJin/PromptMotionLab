@@ -1,6 +1,9 @@
 # Unreal Content (binary assets - too large for GitHub)
 Client-Unreal/**/Content/
 
+# Local planning, portfolio notes, and generated analysis docs
+Docs/
+
 # Claude Code local settings
 .claude/settings.local.json
 

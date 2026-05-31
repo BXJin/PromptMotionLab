@@ -15,5 +15,6 @@ class CharacterProfile(BaseModel):
     follow_up_tendency: float = Field(0.45, ge=0.0, le=1.0, alias="followUpTendency")
     reply_length: float = Field(0.35, ge=0.0, le=1.0, alias="replyLength")
     speech_register: str = Field("casual_polite", alias="speechRegister")
+    response_examples: list[str] = Field(default_factory=list, alias="responseExamples")
 
     model_config = {"populate_by_name": True}

@@ -1,233 +1,185 @@
 # PromptMotionLab Server
 
-FastAPI backend for the first MVP pipeline:
+FastAPI backend for the realtime 3D AI character runtime.
+
+The server owns speech recognition, LLM behavior planning, TTS generation,
+character profile prompting, short-session history, safety/limit checks, and
+latency logging. Unreal owns the visible character execution.
 
 ```text
-prompt -> MotionSpec -> ProceduralGestureJson
-prompt + MotionSpec -> EnrichedPromptExport
-message + SceneContext -> reply + BehaviorJson
+transcript/message
+-> RuntimeCharacterService
+-> Runtime provider routing
+-> reply + BehaviorJson
+-> async TTS segments + viseme timeline
+-> Unreal playback
 ```
 
-This server intentionally does not depend on PyTorch. Local Gemma/Qwen/Llama support belongs in a later isolated worker.
-
-## Run
+## Run Locally
 
 ```powershell
+cd Server-Python
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -e .
 uvicorn app.main:app --reload --port 8010
 ```
 
-## Verify
+Health check:
 
 ```powershell
-python -m compileall app
-python -m app.self_check
+Invoke-WebRequest http://localhost:8010/health -UseBasicParsing
 ```
 
-## Runtime LLM Smoke Test
+## Environment
 
-Start the server first, then run from the repository root:
-
-```powershell
-python scripts\runtime_llm_smoke_test.py --base-url http://localhost:8010
-```
-
-The script sends several Korean runtime prompts, checks `reply`, `behavior`, and
-`metadata`, then writes CSV/JSON reports under:
+Minimum local LLM/STT/TTS setup:
 
 ```text
-Build/reports/
+OPENAI_API_KEY=
+AZURE_SPEECH_KEY=
+AZURE_SPEECH_REGION=koreacentral
 ```
 
-## Runtime Streaming API
+Common runtime settings:
 
 ```text
-POST /api/runtime/respond/stream
-```
-
-This SSE endpoint sends:
-
-```text
-event: reaction
-data: immediate thinking/listening Behavior JSON
-
-event: final
-data: final reply + behavior + metadata
-```
-
-The existing Unreal HTTP client still uses `/api/runtime/respond`. To get the
-perceived-latency benefit in Unreal, the client must consume this stream endpoint
-and apply the `reaction` event immediately.
-
-## Runtime WebSocket API
-
-```text
-WS /ws/runtime
-```
-
-Client message:
-
-```json
-{
-  "type": "runtime_request",
-  "requestId": "ue_001",
-  "sessionId": "demo_session",
-  "characterId": "default_girl",
-  "message": "Explain this exhibit.",
-  "sceneContext": {}
-}
-```
-
-Server messages:
-
-```json
-{
-  "type": "reaction",
-  "requestId": "ue_001",
-  "behavior": {
-    "emotion": "thinking",
-    "intensity": 0.45
-  }
-}
-```
-
-```json
-{
-  "type": "final",
-  "requestId": "ue_001",
-  "response": {
-    "reply": "...",
-    "behavior": {},
-    "metadata": {}
-  }
-}
-```
-
-Unreal should use this WebSocket path for low-latency runtime interaction and keep
-the HTTP endpoint as a fallback/manual test path.
-
-## Runtime Character API
-
-First runtime endpoint for Unreal integration:
-
-```text
-POST /api/runtime/respond
-```
-
-Runtime response generation uses OpenAI when `OPENAI_API_KEY` or `openai_api_key`
-is present. Without a key, or when the provider fails/timeouts, the server falls
-back to the deterministic mock provider so Unreal can keep running.
-
-The runtime service keeps a short in-memory conversation history per `sessionId`
-and passes recent turns to the active provider. This is intentionally process-local
-for the MVP; persistent memory should be added only after the runtime behavior is
-stable.
-
-Character profile support is intentionally minimal for the MVP. `default_girl`
-and `default_guide` currently provide only persona, speech style, default emotion,
-and an emotion intensity scale. Avoid adding long lore or relationship systems
-until the single-character conversation loop is stable.
-
-Optional environment variables:
-
-```text
-OPENAI_MODEL=gpt-4o-mini
-OPENAI_RESPONSES_ENDPOINT=https://api.openai.com/v1/responses
+OPENAI_MODEL=gpt-4.1-mini
+OPENAI_FAST_MODEL=gpt-4.1-nano
 OPENAI_TIMEOUT_SECONDS=6.0
 RUNTIME_PROVIDER_TIMEOUT_SECONDS=6.5
 RUNTIME_MAX_SESSION_TURNS=40
-RUNTIME_TECH_PROFILE=text_llm_behavior_json_v1
-RUNTIME_INPUT_MODE=text
+RUNTIME_OPENAI_HISTORY_TURNS=20
 RUNTIME_METRICS_CSV_PATH=Server-Python/data/metrics/runtime_latency.csv
-AZURE_SPEECH_KEY=
-AZURE_SPEECH_REGION=
-AZURE_TTS_VOICE=en-US-JennyNeural
 AZURE_TTS_KO_VOICE=ko-KR-SunHiNeural
 ```
 
-Azure TTS is optional. Without `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`,
-the server uses `MockTtsProvider` and returns a silent WAV so the Unreal
-audio/lip-sync integration can be developed without cloud credentials.
+Without Azure Speech settings, the app can still use mock/fallback providers for
+contract testing, but the full voice demo needs Azure Speech.
 
-Install Azure Speech support when needed:
+## Runtime APIs
 
-```powershell
-pip install -e .[azure]
-```
+| API | Role |
+| --- | --- |
+| `GET /health` | App Service and local health check |
+| `POST /api/runtime/respond` | Synchronous text runtime response |
+| `POST /api/runtime/turn-async` | Starts async reply/TTS job and returns immediate reaction |
+| `GET /api/runtime/turn-async/{job_id}` | Polls async final reply and TTS segment readiness |
+| `POST /api/runtime/tts/synthesize` | Creates WAV + viseme timeline for text |
+| `GET /api/runtime/audio/{utterance_id}.wav` | Downloads generated audio |
+| `WS /ws/stt` | Streaming STT endpoint used by Unreal PTT |
+| `WS /ws/runtime` | Runtime WebSocket path for low-latency experiments |
 
-Runtime latency rows are appended to:
+## Key Code
 
-```text
-Server-Python/data/metrics/runtime_latency.csv
-```
+### API
 
-Use `RUNTIME_METRICS_CSV_PATH` to move the file, for example to a shared
-`Build/metrics` directory.
+| File | Role |
+| --- | --- |
+| [`app/main.py`](app/main.py) | FastAPI app construction and middleware setup |
+| [`app/api/routes.py`](app/api/routes.py) | HTTP and WebSocket route definitions |
+| [`app/dependencies.py`](app/dependencies.py) | Provider/service wiring from environment variables |
 
-## Runtime TTS
+### Runtime Conversation
 
-Generate a Speech Timeline:
+| File | Role |
+| --- | --- |
+| [`app/services/runtime_character_service.py`](app/services/runtime_character_service.py) | Main reply pipeline, session history, provider fallback, behavior guard |
+| [`app/services/runtime_turn_async_job_service.py`](app/services/runtime_turn_async_job_service.py) | Async turn jobs that let Unreal start reaction before TTS completion |
+| [`app/services/runtime_session_store.py`](app/services/runtime_session_store.py) | In-memory short-term session history |
+| [`app/services/runtime_scenario_service.py`](app/services/runtime_scenario_service.py) | Small scenario layer, such as repeated emotional disclosure and focused object explanation |
 
-```http
-POST /api/runtime/tts/synthesize
-```
+### LLM Providers
 
-Request:
+| File | Role |
+| --- | --- |
+| [`app/providers/runtime/routing_openai_provider.py`](app/providers/runtime/routing_openai_provider.py) | Routes short social turns to fast model and complex turns to stronger model |
+| [`app/providers/runtime/openai_provider.py`](app/providers/runtime/openai_provider.py) | OpenAI Responses API call, JSON parsing, behavior normalization |
+| [`app/providers/runtime/fast_path_provider.py`](app/providers/runtime/fast_path_provider.py) | Deterministic cheap replies for common greetings/fallbacks |
+| [`app/providers/runtime/mock_provider.py`](app/providers/runtime/mock_provider.py) | Deterministic provider for tests and fallback |
+
+### Character Profile
+
+| File | Role |
+| --- | --- |
+| [`app/services/character_profile_store.py`](app/services/character_profile_store.py) | Airi profiles and MBTI-style aliases |
+| [`app/providers/runtime/profile_prompt_builder.py`](app/providers/runtime/profile_prompt_builder.py) | Converts profile values and few-shot examples into model instructions |
+| [`app/contracts/character_profile.py`](app/contracts/character_profile.py) | Profile contract |
+
+### Speech
+
+| File | Role |
+| --- | --- |
+| [`app/services/stt_service.py`](app/services/stt_service.py) | Batch STT service wrapper |
+| [`app/providers/stt/azure_streaming_provider.py`](app/providers/stt/azure_streaming_provider.py) | Azure streaming STT provider used by `/ws/stt` |
+| [`app/providers/stt/openai_provider.py`](app/providers/stt/openai_provider.py) | OpenAI batch STT fallback/debug path |
+| [`app/services/tts_service.py`](app/services/tts_service.py) | TTS orchestration and timeline response |
+| [`app/services/tts_async_job_service.py`](app/services/tts_async_job_service.py) | Async TTS segment generation for turn jobs |
+| [`app/providers/tts/azure_provider.py`](app/providers/tts/azure_provider.py) | Azure TTS WAV and viseme generation |
+| [`app/providers/tts/wav_trim.py`](app/providers/tts/wav_trim.py) | WAV post-processing helpers |
+
+### Security And Ops
+
+| File | Role |
+| --- | --- |
+| [`app/security/rate_limit.py`](app/security/rate_limit.py) | In-memory request rate limiting |
+| [`app/security/body_size_limit.py`](app/security/body_size_limit.py) | Request body size guard |
+| [`app/security/websocket_limits.py`](app/security/websocket_limits.py) | WebSocket message/audio limits |
+| [`app/security/log_redaction.py`](app/security/log_redaction.py) | Production transcript/reply redaction helpers |
+| [`app/services/latency_metrics_logger.py`](app/services/latency_metrics_logger.py) | CSV latency metrics writer |
+
+## Behavior JSON Contract
+
+The LLM does not output morph targets directly. It returns compact behavior:
 
 ```json
 {
-  "text": "Hello. Nice to meet you.",
-  "ttsStyle": "warm"
-}
-```
-
-Download audio:
-
-```http
-GET /api/runtime/audio/{utteranceId}.wav
-```
-
-The `tech_profile` column records which pipeline or optimization set produced the
-measurement, for example `text_llm_behavior_json_v1`, `push_to_talk_stt_v1`, or
-`vad_eot_v1`.
-
-Example body:
-
-```json
-{
-  "sessionId": "demo_session",
-  "characterId": "default_guide",
-  "message": "Explain this exhibit.",
-  "sceneContext": {
-    "locationId": "demo_hall",
-    "focusedObjectId": "exhibit_01",
-    "nearbyObjectIds": ["exhibit_01", "exhibit_02"],
-    "interactionMode": "object_selected"
-  }
-}
-```
-
-Example response:
-
-```json
-{
-  "reply": "exhibit_01 is the current focus. I will look toward it and explain the key point in a concise way.",
+  "reply": "오, 뭐 봤어?",
   "behavior": {
     "emotion": "friendly",
-    "intensity": 0.62,
-    "confidence": 0.86,
-    "intent": "explain",
-    "gaze": "focused_object",
-    "gestureKey": "explain_small",
+    "intensity": 0.55,
+    "confidence": 0.82,
+    "intent": "answer",
+    "gaze": "user",
+    "gestureKey": "small_ack",
     "headMotion": "small_nod",
     "ttsStyle": "warm"
-  },
-  "metadata": {
-    "provider": "OpenAiRuntimeBehaviorProvider",
-    "fallbackUsed": false,
-    "providerLatencyMs": 1234
   }
 }
 ```
+
+Unreal maps this to stable local presets. This keeps latency and animation
+quality under client control.
+
+## Tests
+
+Run all server tests from the repository root:
+
+```powershell
+python -m pytest Server-Python\tests
+```
+
+Focused runtime checks:
+
+```powershell
+python -m pytest Server-Python\tests\test_api.py -k "runtime_service or openai_provider"
+```
+
+Production smoke test from the repository root:
+
+```powershell
+python scripts\production_smoke_test.py
+```
+
+## Deployment
+
+Current Azure App Service deployment uses a zip package with `startup.sh`.
+The startup script creates a persistent virtual environment under `/home/site`
+and runs:
+
+```bash
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+This avoids repeated Oryx package-build delays and keeps restart time predictable
+after the first dependency install.

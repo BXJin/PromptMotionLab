@@ -343,6 +343,9 @@ void FPromptMotionSpeechPlaybackController::PlayAudio(const FString& RequestId, 
     if (!Segments.IsValidIndex(SegmentIndex))
         return;
 
+    UE_LOG(LogPromptMotion, Log, TEXT("[TTS] SegmentGap - PlayAudio entry seg=%d playAudioEntrySec=%.4f"),
+        SegmentIndex, FPlatformTime::Seconds());
+
     FSpeechSegment& Segment = Segments[SegmentIndex];
     FWavParseResult WavInfo;
     if (!TryParseWavHeader(Segment.WavBytes, WavInfo))
@@ -377,6 +380,7 @@ void FPromptMotionSpeechPlaybackController::PlayAudio(const FString& RequestId, 
     if (AudioComponent.IsValid())
         AudioComponent->Stop();
 
+    const double SpawnStartSec = FPlatformTime::Seconds();
     AudioComponent = UGameplayStatics::SpawnSound2D(
         OwnerObject,
         ProcWave,
@@ -385,7 +389,8 @@ void FPromptMotionSpeechPlaybackController::PlayAudio(const FString& RequestId, 
         0.0f,
         nullptr,
         false,
-        false);
+        true); // bAutoDestroy=true: component self-destructs on finish → OnAudioFinishedNative fires reliably
+    const double SpawnEndSec = FPlatformTime::Seconds();
 
     if (!AudioComponent.IsValid())
     {
@@ -452,7 +457,7 @@ void FPromptMotionSpeechPlaybackController::PlayAudio(const FString& RequestId, 
             false);
     }
 
-    UE_LOG(LogPromptMotion, Log, TEXT("[TTS] Audio playing - segment=%d/%d %dHz %dch %dbit %.2fs queued=%d playing=%s"),
+    UE_LOG(LogPromptMotion, Log, TEXT("[TTS] Audio playing - segment=%d/%d %dHz %dch %dbit %.2fs queued=%d playing=%s spawnMs=%.1f"),
         SegmentIndex + 1,
         Segments.Num(),
         WavInfo.SampleRate,
@@ -460,7 +465,8 @@ void FPromptMotionSpeechPlaybackController::PlayAudio(const FString& RequestId, 
         WavInfo.BitsPerSample,
         ComputedDuration,
         ProcWave->GetAvailableAudioByteCount(),
-        AudioComponent->IsPlaying() ? TEXT("true") : TEXT("false"));
+        AudioComponent->IsPlaying() ? TEXT("true") : TEXT("false"),
+        (SpawnEndSec - SpawnStartSec) * 1000.0);
 }
 
 void FPromptMotionSpeechPlaybackController::HandleAudioFinished(const FString& RequestId, int32 SegmentIndex)
@@ -468,19 +474,27 @@ void FPromptMotionSpeechPlaybackController::HandleAudioFinished(const FString& R
     if (ActiveRequestId != RequestId || SegmentIndex != CurrentSegmentIndex)
         return;
 
+    const double FinishedAtSec = FPlatformTime::Seconds();
     ClearAudioFinishTimer();
 
-    TWeakObjectPtr<UAudioComponent> FinishedAudioComponent = AudioComponent;
+    // bAutoDestroy=true: component already self-destructing — no explicit Stop() needed.
+    // Clearing the pointer first ensures TryPlaySegment's IsValid()/IsPlaying() check passes cleanly.
     ActiveSoundWave.Reset();
     AudioComponent.Reset();
     CurrentSegmentIndex = INDEX_NONE;
 
-    if (FinishedAudioComponent.IsValid() && FinishedAudioComponent->IsPlaying())
-        FinishedAudioComponent->Stop();
-
     const int32 NextIndex = SegmentIndex + 1;
     if (Segments.IsValidIndex(NextIndex))
+    {
+        UE_LOG(LogPromptMotion, Log, TEXT("[TTS] SegmentGap - seg%d finished, calling TryPlaySegment(%d) gapStartSec=%.4f"),
+            SegmentIndex, NextIndex, FinishedAtSec);
         TryPlaySegment(NextIndex);
+    }
+    else
+    {
+        UE_LOG(LogPromptMotion, Log, TEXT("[TTS] SegmentGap - seg%d finished (last segment) finishedAtSec=%.4f"),
+            SegmentIndex, FinishedAtSec);
+    }
 }
 
 void FPromptMotionSpeechPlaybackController::ClearAudioFinishTimer()

@@ -60,7 +60,7 @@ class RuntimeScenarioService:
         scene_context: SceneContext,
         history: list[RuntimeConversationTurn],
     ) -> RuntimeScenarioMatch | None:
-        emotional_hits = self._count_emotional_user_turns(message, history)
+        emotional_hits = self._count_recent_emotional_user_turns(message, history)
         if emotional_hits >= 2:
             return RuntimeScenarioMatch(
                 scenario_id="repeated_emotional_disclosure",
@@ -124,11 +124,17 @@ class RuntimeScenarioService:
 
         return behavior
 
-    def _count_emotional_user_turns(self, message: str, history: list[RuntimeConversationTurn]) -> int:
-        count = 1 if looks_like_emotional_disclosure(message) else 0
-        for turn in history:
-            if turn.role == "user" and looks_like_emotional_disclosure(turn.content):
-                count += 1
+    def _count_recent_emotional_user_turns(self, message: str, history: list[RuntimeConversationTurn]) -> int:
+        if not looks_like_emotional_disclosure(message):
+            return 0
+
+        count = 1
+        for turn in reversed(history):
+            if turn.role != "user":
+                continue
+            if not looks_like_emotional_disclosure(turn.content):
+                break
+            count += 1
         return count
 
     def _looks_like_emotional_disclosure(self, text: str) -> bool:

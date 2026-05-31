@@ -33,12 +33,12 @@ FString CharacterIdForConversationMode(EPromptMotionConversationMode Mode)
     switch (Mode)
     {
     case EPromptMotionConversationMode::EnglishTutor:
-        return TEXT("default_english_tutor");
+        return TEXT("airi_english_tutor");
     case EPromptMotionConversationMode::Guide:
-        return TEXT("default_guide");
+        return TEXT("airi_guide");
     case EPromptMotionConversationMode::Casual:
     default:
-        return TEXT("default_girl");
+        return TEXT("airi");
     }
 }
 }
@@ -49,11 +49,11 @@ UPromptMotionRuntimeComponent::UPromptMotionRuntimeComponent()
     PrimaryComponentTick.bStartWithTickEnabled = false;
 
     CharacterPresets = {
-        TEXT("default_girl"),
-        TEXT("e_f_n"), TEXT("e_f_s"),
-        TEXT("e_t_n"), TEXT("e_t_s"),
-        TEXT("i_f_n"), TEXT("i_f_s"),
-        TEXT("i_t_n"), TEXT("i_t_s"),
+        TEXT("airi"),
+        TEXT("airi_bright"), TEXT("airi_cheerful"),
+        TEXT("airi_idea"), TEXT("airi_direct"),
+        TEXT("airi_soft"), TEXT("airi_calm"),
+        TEXT("airi_reflective"), TEXT("airi_practical"),
     };
 }
 
