@@ -184,6 +184,7 @@ class RuntimeTurnAsyncJobService:
         response_result: RuntimeCharacterResult,
     ) -> SpeechTimeline:
         texts = self._split_tts_segments(response_result.reply)
+        segment_started_at = monotonic()
         if len(texts) <= 1:
             text = texts[0] if texts else response_result.reply.strip()
             speech_timeline = await self._tts_service.synthesize(
@@ -226,10 +227,24 @@ class RuntimeTurnAsyncJobService:
                     ttsLatencyMs=total_tts_latency_ms,
                 )
                 await self._set_partial_speech_timeline(turn_job_id, group_timeline)
+                logger.info(
+                    "Runtime turn first TTS segment ready. turn_job_id=%s segment=%d elapsed_ms=%d text_chars=%d",
+                    turn_job_id,
+                    index,
+                    int((monotonic() - segment_started_at) * 1000),
+                    len(text),
+                )
             else:
                 group_timeline.segments = list(segments)
                 group_timeline.tts_latency_ms = total_tts_latency_ms
                 await self._set_partial_speech_timeline(turn_job_id, group_timeline)
+                logger.info(
+                    "Runtime turn TTS segment appended. turn_job_id=%s segment=%d elapsed_ms=%d text_chars=%d",
+                    turn_job_id,
+                    index,
+                    int((monotonic() - segment_started_at) * 1000),
+                    len(text),
+                )
 
         if group_timeline is None:
             raise RuntimeError("Segmented TTS did not produce a speech timeline")

@@ -25,7 +25,7 @@ from app.providers.runtime.openai_provider import OpenAiRuntimeBehaviorProvider
 from app.providers.runtime.profile_prompt_builder import ProfilePromptBuilder
 from app.providers.stt import StreamingSttEvent
 from app.providers.stt.streaming_factory import create_streaming_stt_session
-from app.providers.tts.base import TtsProvider
+from app.providers.tts.base import TtsProvider, TtsResult
 from app.providers.tts.wav_trim import trim_wav_file_to_duration
 from app.security import BodySizeLimitMiddleware, RateLimitMiddleware, SlidingWindowRateLimiter, WebSocketConnectionLimiter
 from app.services.provider_failure_logger import ProviderFailureLogger
@@ -875,6 +875,71 @@ def test_runtime_turn_async_job_returns_segmented_tts_for_multi_sentence_reply()
     assert len(result.speech_timeline.segments) == 2
     assert result.speech_timeline.audio.url == result.speech_timeline.segments[0].audio.url
     assert result.speech_timeline.segments[1].start_time >= result.speech_timeline.segments[0].duration_seconds
+
+
+def test_runtime_turn_async_job_splits_korean_sentence_punctuation() -> None:
+    service = RuntimeTurnAsyncJobService(RuntimeCharacterService(), TtsService(), max_tts_segments=4)
+
+    segments = service._split_tts_segments("안녕. 오늘 영화 봤어? 재밌었어! 다음에 또 볼래.")
+
+    assert segments == ["안녕.", "오늘 영화 봤어?", "재밌었어!", "다음에 또 볼래."]
+
+
+def test_runtime_turn_async_job_exposes_first_segment_before_full_turn_tts() -> None:
+    reply = "안녕. 오늘 영화 봤어? 재밌었어!"
+
+    class ThreeSentenceProvider(RuntimeBehaviorProvider):
+        async def respond(
+            self,
+            message: str,
+            scene_context: SceneContext,
+            character_id: str,
+            conversation_history: list | None = None,
+            character_profile: object | None = None,
+        ) -> tuple[str, BehaviorJson]:
+            del message, scene_context, character_id, conversation_history, character_profile
+            return reply, BehaviorJson(intent="greet", emotion="friendly")
+
+    class LengthScaledTtsProvider(TtsProvider):
+        provider_name = "LengthScaledTtsProvider"
+        model_name = "delay-by-length"
+
+        async def synthesize(self, *, text, output_path, tts_style, voice=None):
+            del tts_style, voice
+            await asyncio.sleep(0.01 + len(text) * 0.002)
+            return TtsResult(
+                audio_path=output_path,
+                duration_seconds=max(0.1, len(text) / 20.0),
+                visemes=[],
+                provider=self.provider_name,
+                model=self.model_name,
+            )
+
+    async def measure_first_timeline(segment_tts_enabled: bool) -> float:
+        service = RuntimeTurnAsyncJobService(
+            RuntimeCharacterService(primary_provider=ThreeSentenceProvider()),
+            TtsService(
+                provider=LengthScaledTtsProvider(),
+                fallback_provider=LengthScaledTtsProvider(),
+                provider_timeout_seconds=1,
+                fallback_timeout_seconds=1,
+            ),
+            segment_tts_enabled=segment_tts_enabled,
+        )
+        job = await service.submit(RuntimeRespondRequestForTest("hello", "default_girl", "turn_latency_compare"))
+        started = time.monotonic()
+        deadline = started + 1.0
+        while time.monotonic() < deadline:
+            current = await service.get(job.turn_job_id)
+            if current and current.speech_timeline is not None:
+                return time.monotonic() - started
+            await asyncio.sleep(0.005)
+        raise AssertionError("speech timeline was not exposed")
+
+    segmented_first_timeline = asyncio.run(measure_first_timeline(segment_tts_enabled=True))
+    full_turn_timeline = asyncio.run(measure_first_timeline(segment_tts_enabled=False))
+
+    assert segmented_first_timeline < full_turn_timeline
 
 
 def test_runtime_turn_async_job_returns_single_segment_for_single_sentence_reply() -> None:

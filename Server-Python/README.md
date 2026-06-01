@@ -177,6 +177,17 @@ Focused runtime checks:
 python -m pytest Server-Python\tests\test_api.py -k "runtime_service or openai_provider"
 ```
 
+TTS first-segment latency comparison:
+
+```powershell
+cd Server-Python
+python scripts\benchmark_runtime_turn_tts_latency.py
+```
+
+This benchmark compares full-turn TTS against segmented TTS. The important
+number is `first_timeline_ms`: Unreal can start downloading and playing the
+first ready segment once this appears, while later segments continue to build.
+
 Production smoke test from the repository root:
 
 ```powershell
