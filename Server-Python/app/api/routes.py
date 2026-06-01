@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from collections.abc import AsyncIterator
 
@@ -58,9 +59,11 @@ from app.services.runtime_async_job_service import RuntimeJobStatus
 from app.services.runtime_turn_async_job_service import RuntimeTurnJobStatus
 from app.services.service_limits import ServiceBusyError
 from app.services.tts_async_job_service import TtsJobStatus
-from app.providers.stt.azure_streaming_provider import AzureSpeechStreamingSttSession
+from app.providers.stt import StreamingSttSession
+from app.providers.stt.streaming_factory import create_streaming_stt_session
 from app.security import WebSocketConnectionLimiter, client_key_from_websocket
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 RETRY_AFTER_SECONDS = "5"
 MAX_STT_AUDIO_BYTES = int(os.getenv("STT_MAX_AUDIO_BYTES", str(5 * 1024 * 1024)))
@@ -527,7 +530,7 @@ async def streaming_stt_websocket(websocket: WebSocket) -> None:
         await websocket.close(code=1008, reason="connection_limit_exceeded")
         return
     await websocket.accept()
-    session: AzureSpeechStreamingSttSession | None = None
+    session: StreamingSttSession | None = None
     try:
         while True:
             message = await websocket.receive()
@@ -535,6 +538,8 @@ async def streaming_stt_websocket(websocket: WebSocket) -> None:
                 payload = json.loads(message["text"])
                 message_type = str(payload.get("type") or "")
                 if message_type == "start":
+                    if session is not None:
+                        await session.stop()
                     session = _create_streaming_stt_session(payload)
                     await session.start()
                     await websocket.send_json({"type": "started"})
@@ -555,30 +560,28 @@ async def streaming_stt_websocket(websocket: WebSocket) -> None:
     except WebSocketDisconnect:
         if session is not None:
             await session.stop()
-    except Exception as exc:
-        del exc
+    except Exception:
+        logger.exception("streaming_stt_websocket error. client=%s", client_key)
         if websocket.client_state != WebSocketState.DISCONNECTED:
             await websocket.send_json({"type": "error", "error": "streaming_stt_failed"})
     finally:
         await STT_WS_LIMITER.release(client_key)
 
 
-def _create_streaming_stt_session(payload: dict) -> AzureSpeechStreamingSttSession:
-    speech_key = os.getenv("AZURE_SPEECH_KEY")
-    speech_region = os.getenv("AZURE_SPEECH_REGION")
-    if not speech_key or not speech_region:
-        raise RuntimeError("Azure Speech credentials are required for streaming STT")
-    return AzureSpeechStreamingSttSession(
-        speech_key=speech_key,
-        speech_region=speech_region,
-        language=str(payload.get("language") or os.getenv("AZURE_STT_LANGUAGE", "ko-KR")),
+def _create_streaming_stt_session(payload: dict) -> StreamingSttSession:
+    language = str(
+        payload.get("language")
+        or os.getenv("STREAMING_STT_LANGUAGE", os.getenv("AZURE_STT_LANGUAGE", "ko-KR"))
+    )
+    return create_streaming_stt_session(
+        language=language,
         sample_rate=_parse_stt_sample_rate(payload),
     )
 
 
 async def _flush_streaming_stt_events(
     websocket: WebSocket,
-    session: AzureSpeechStreamingSttSession,
+    session: StreamingSttSession,
     *,
     final_wait_seconds: float = 0.0,
 ) -> None:

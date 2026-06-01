@@ -2,21 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import time
-from dataclasses import dataclass
+
+from app.providers.stt.base import StreamingSttEvent, StreamingSttProvider, StreamingSttSession
 
 
-@dataclass(frozen=True)
-class StreamingSttEvent:
-    type: str
-    text: str = ""
-    language: str | None = None
-    duration_ms: int = 0
-    provider: str = "AzureSpeechStreamingSttProvider"
-    model: str = "azure-speech-streaming"
-    error: str = ""
-
-
-class AzureSpeechStreamingSttSession:
+class AzureSpeechStreamingSttSession(StreamingSttSession):
     provider_name = "AzureSpeechStreamingSttProvider"
     model_name = "azure-speech-streaming"
 
@@ -53,10 +43,14 @@ class AzureSpeechStreamingSttSession:
         await asyncio.to_thread(self._push_stream.write, pcm_bytes)
 
     async def stop(self) -> None:
-        if self._push_stream is not None:
-            await asyncio.to_thread(self._push_stream.close)
-        if self._recognizer is not None:
-            await asyncio.to_thread(lambda: self._recognizer.stop_continuous_recognition_async().get())
+        try:
+            if self._push_stream is not None:
+                await asyncio.to_thread(self._push_stream.close)
+        finally:
+            self._push_stream = None
+            if self._recognizer is not None:
+                await asyncio.to_thread(lambda: self._recognizer.stop_continuous_recognition_async().get())
+                self._recognizer = None
 
     async def next_event(self, timeout_seconds: float = 0.0) -> StreamingSttEvent | None:
         try:
@@ -113,3 +107,24 @@ def _normalize_language(language: str | None) -> str:
     if lower == "en":
         return "en-US"
     return normalized
+
+
+class AzureSpeechStreamingSttProvider(StreamingSttProvider):
+    provider_name = "AzureSpeechStreamingSttProvider"
+
+    def __init__(self, *, speech_key: str, speech_region: str) -> None:
+        self._speech_key = speech_key
+        self._speech_region = speech_region
+
+    def create_session(
+        self,
+        *,
+        language: str,
+        sample_rate: int,
+    ) -> AzureSpeechStreamingSttSession:
+        return AzureSpeechStreamingSttSession(
+            speech_key=self._speech_key,
+            speech_region=self._speech_region,
+            language=language,
+            sample_rate=sample_rate,
+        )

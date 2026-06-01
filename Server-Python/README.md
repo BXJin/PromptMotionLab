@@ -111,12 +111,24 @@ contract testing, but the full voice demo needs Azure Speech.
 | File | Role |
 | --- | --- |
 | [`app/services/stt_service.py`](app/services/stt_service.py) | Batch STT service wrapper |
-| [`app/providers/stt/azure_streaming_provider.py`](app/providers/stt/azure_streaming_provider.py) | Azure streaming STT provider used by `/ws/stt` |
+| [`app/providers/stt/streaming_factory.py`](app/providers/stt/streaming_factory.py) | Selects the `/ws/stt` streaming provider from `STREAMING_STT_PROVIDER` |
+| [`app/providers/stt/azure_streaming_provider.py`](app/providers/stt/azure_streaming_provider.py) | Azure streaming STT provider, default production path |
+| [`app/providers/stt/openai_realtime_streaming_provider.py`](app/providers/stt/openai_realtime_streaming_provider.py) | OpenAI Realtime transcription provider for low-latency STT comparison |
+| [`app/providers/stt/google_streaming_provider.py`](app/providers/stt/google_streaming_provider.py) | Google Speech-to-Text streaming provider, optional dependency |
 | [`app/providers/stt/openai_provider.py`](app/providers/stt/openai_provider.py) | OpenAI batch STT fallback/debug path |
 | [`app/services/tts_service.py`](app/services/tts_service.py) | TTS orchestration and timeline response |
 | [`app/services/tts_async_job_service.py`](app/services/tts_async_job_service.py) | Async TTS segment generation for turn jobs |
 | [`app/providers/tts/azure_provider.py`](app/providers/tts/azure_provider.py) | Azure TTS WAV and viseme generation |
 | [`app/providers/tts/wav_trim.py`](app/providers/tts/wav_trim.py) | WAV post-processing helpers |
+
+Streaming STT selection:
+
+```env
+STREAMING_STT_PROVIDER=azure   # azure | openai | google
+STREAMING_STT_LANGUAGE=ko-KR
+```
+
+Google streaming STT is optional to keep Azure App Service deployment light. Install `requirements-stt-google.txt` before selecting `STREAMING_STT_PROVIDER=google`.
 
 ### Security And Ops
 

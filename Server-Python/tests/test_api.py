@@ -6,6 +6,7 @@ import wave
 import pytest
 from fastapi.testclient import TestClient
 
+from app.api import routes as api_routes
 from app.api.routes import _parse_stt_sample_rate
 from app.contracts.requests import RuntimeRespondRequest
 from app.contracts.responses import RuntimeResponseMetadata
@@ -22,6 +23,8 @@ from app.main import app
 from app.providers.runtime import RoutingOpenAiRuntimeBehaviorProvider, RuntimeBehaviorProvider
 from app.providers.runtime.openai_provider import OpenAiRuntimeBehaviorProvider
 from app.providers.runtime.profile_prompt_builder import ProfilePromptBuilder
+from app.providers.stt import StreamingSttEvent
+from app.providers.stt.streaming_factory import create_streaming_stt_session
 from app.providers.tts.base import TtsProvider
 from app.providers.tts.wav_trim import trim_wav_file_to_duration
 from app.security import BodySizeLimitMiddleware, RateLimitMiddleware, SlidingWindowRateLimiter, WebSocketConnectionLimiter
@@ -257,6 +260,130 @@ def test_runtime_stt_rejects_large_content_length() -> None:
 def test_streaming_stt_rejects_unsupported_sample_rate() -> None:
     with pytest.raises(ValueError, match="unsupported_sample_rate"):
         _parse_stt_sample_rate({"sampleRate": 999999999})
+
+
+def test_streaming_stt_factory_creates_azure_session(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("STREAMING_STT_PROVIDER", "azure")
+    monkeypatch.setenv("AZURE_SPEECH_KEY", "test")
+    monkeypatch.setenv("AZURE_SPEECH_REGION", "koreacentral")
+
+    session = create_streaming_stt_session(language="ko-KR", sample_rate=16000)
+
+    assert session.provider_name == "AzureSpeechStreamingSttProvider"
+    assert session.model_name == "azure-speech-streaming"
+
+
+def test_streaming_stt_factory_creates_openai_session(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("STREAMING_STT_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+    monkeypatch.setenv("OPENAI_REALTIME_STT_MODEL", "gpt-4o-transcribe")
+
+    session = create_streaming_stt_session(language="ko-KR", sample_rate=24000)
+
+    assert session.provider_name == "OpenAiRealtimeStreamingSttProvider"
+    assert session.model_name == "gpt-4o-transcribe"
+
+
+def test_streaming_stt_factory_creates_google_session(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("STREAMING_STT_PROVIDER", "google")
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "test-project")
+    monkeypatch.setenv("GOOGLE_STT_MODEL", "latest_short")
+
+    session = create_streaming_stt_session(language="ko-KR", sample_rate=16000)
+
+    assert session.provider_name == "GoogleSpeechStreamingSttProvider"
+    assert session.model_name == "latest_short"
+
+
+def test_streaming_stt_websocket_stops_previous_session_on_duplicate_start(monkeypatch: pytest.MonkeyPatch) -> None:
+    sessions = []
+
+    class FakeStreamingSession:
+        provider_name = "FakeStreamingSttProvider"
+        model_name = "fake"
+
+        def __init__(self) -> None:
+            self.started = 0
+            self.stopped = 0
+
+        async def start(self) -> None:
+            self.started += 1
+
+        async def write(self, pcm_bytes: bytes) -> None:
+            del pcm_bytes
+
+        async def stop(self) -> None:
+            self.stopped += 1
+
+        async def next_event(self, timeout_seconds: float = 0.0):
+            del timeout_seconds
+            return None
+
+    def fake_create_streaming_stt_session(*, language: str, sample_rate: int):
+        del language, sample_rate
+        session = FakeStreamingSession()
+        sessions.append(session)
+        return session
+
+    monkeypatch.setattr(api_routes, "create_streaming_stt_session", fake_create_streaming_stt_session)
+    client = TestClient(app)
+
+    with client.websocket_connect("/ws/stt") as websocket:
+        websocket.send_json({"type": "start", "sampleRate": 16000})
+        assert websocket.receive_json()["type"] == "started"
+        websocket.send_json({"type": "start", "sampleRate": 16000})
+        assert websocket.receive_json()["type"] == "started"
+        websocket.send_json({"type": "stop"})
+        assert websocket.receive_json()["type"] == "stopped"
+
+    assert len(sessions) == 2
+    assert sessions[0].stopped == 1
+    assert sessions[1].stopped == 1
+
+
+def test_streaming_stt_websocket_logs_provider_errors(monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture) -> None:
+    def raise_streaming_stt_session(*, language: str, sample_rate: int):
+        del language, sample_rate
+        raise RuntimeError("provider config failed")
+
+    monkeypatch.setattr(api_routes, "create_streaming_stt_session", raise_streaming_stt_session)
+    client = TestClient(app)
+
+    with caplog.at_level("ERROR"):
+        with client.websocket_connect("/ws/stt") as websocket:
+            websocket.send_json({"type": "start", "sampleRate": 16000})
+            response = websocket.receive_json()
+
+    assert response == {"type": "error", "error": "streaming_stt_failed"}
+    assert "streaming_stt_websocket error" in caplog.text
+
+
+def test_streaming_stt_flush_skips_empty_partial_and_final() -> None:
+    sent = []
+
+    class FakeWebSocket:
+        async def send_json(self, payload):
+            sent.append(payload)
+
+    class FakeSession:
+        def __init__(self) -> None:
+            self.events = [
+                StreamingSttEvent(type="partial", text=""),
+                StreamingSttEvent(type="final", text=""),
+                StreamingSttEvent(type="final", text="안녕", language="ko-KR", provider="fake", model="fake"),
+            ]
+
+        async def next_event(self, timeout_seconds: float = 0.0):
+            del timeout_seconds
+            if not self.events:
+                return None
+            return self.events.pop(0)
+
+    asyncio.run(api_routes._flush_streaming_stt_events(FakeWebSocket(), FakeSession()))
+
+    assert len(sent) == 1
+    assert sent[0]["type"] == "final"
+    assert sent[0]["text"] == "안녕"
 
 
 def test_runtime_respond_uncertain_message() -> None:
