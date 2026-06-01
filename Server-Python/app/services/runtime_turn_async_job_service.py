@@ -16,6 +16,15 @@ from app.services.tts_service import TtsService
 
 logger = logging.getLogger(__name__)
 
+SENTENCE_SPLIT_PATTERN = re.compile(r"(?<=[.!?\u3002\uff01\uff1f])\s+")
+SHORT_REACTION_PATTERN = re.compile(
+    r"^(?:"
+    r"ah+|oh+|yeah|yep|okay|ok|right|really|wait|"
+    r"\uc544+|\uc624+|\uc751+|\uc74c+|\uc5b4+|\uadf8\ub798|\ub9de\uc544|\ubb50\uc57c|\uc9c4\uc9dc|\uc640|\ud5d0"
+    r")[.!?\u3002\uff01\uff1f\u2026~]*$",
+    re.IGNORECASE,
+)
+
 
 class RuntimeTurnJobStatus(StrEnum):
     PENDING = "pending"
@@ -343,17 +352,52 @@ class RuntimeTurnAsyncJobService:
 
         parts = [
             part.strip()
-            for part in re.split(r"(?<=[.!?。！？])\s+", normalized)
+            for part in SENTENCE_SPLIT_PATTERN.split(normalized)
             if part.strip()
         ]
         if not parts:
             return [normalized]
+        parts = self._merge_natural_first_segment(parts)
         if len(parts) <= self._max_tts_segments:
             return parts
 
         head = parts[: self._max_tts_segments - 1]
         tail = " ".join(parts[self._max_tts_segments - 1 :])
         return [*head, tail]
+
+    def _merge_natural_first_segment(self, parts: list[str]) -> list[str]:
+        if len(parts) < 2:
+            return parts
+
+        first = parts[0].strip()
+        second = parts[1].strip()
+        if not first or not second:
+            return parts
+
+        if not self._should_merge_first_segment(first, second):
+            return parts
+
+        merged = f"{first} {second}"
+        logger.info(
+            "Runtime turn merged short first TTS reaction. first_chars=%d second_chars=%d merged_chars=%d",
+            len(first),
+            len(second),
+            len(merged),
+        )
+        return [merged, *parts[2:]]
+
+    def _should_merge_first_segment(self, first: str, second: str) -> bool:
+        first_body = first.strip().strip(".!?\u3002\uff01\uff1f\u2026~ ")
+        if not first_body:
+            return False
+
+        if len(first_body) > 8:
+            return False
+
+        if len(first) + 1 + len(second) > 45:
+            return False
+
+        return bool(SHORT_REACTION_PATTERN.match(first.strip()))
 
     async def _mark_failed(self, turn_job_id: str, error: str) -> None:
         async with self._lock:

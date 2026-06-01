@@ -885,6 +885,33 @@ def test_runtime_turn_async_job_splits_korean_sentence_punctuation() -> None:
     assert segments == ["안녕.", "오늘 영화 봤어?", "재밌었어!", "다음에 또 볼래."]
 
 
+def test_runtime_turn_async_job_merges_short_first_reaction_with_next_sentence() -> None:
+    service = RuntimeTurnAsyncJobService(RuntimeCharacterService(), TtsService(), max_tts_segments=4)
+
+    segments = service._split_tts_segments(
+        "\uadf8\ub798? \uaf64 \uc313\uc600\ub098 \ubcf4\ub124. \uc65c \uc62e\uae30\uace0 \uc2f6\uc740\ub370?"
+    )
+
+    assert segments == [
+        "\uadf8\ub798? \uaf64 \uc313\uc600\ub098 \ubcf4\ub124.",
+        "\uc65c \uc62e\uae30\uace0 \uc2f6\uc740\ub370?",
+    ]
+
+
+def test_runtime_turn_async_job_does_not_merge_long_first_sentence() -> None:
+    service = RuntimeTurnAsyncJobService(RuntimeCharacterService(), TtsService(), max_tts_segments=4)
+
+    segments = service._split_tts_segments(
+        "\uc774\uc9c1 \uc0dd\uac01\uc774 \uacc4\uc18d \uba38\ub9ac\uc5d0 \ub9f4\ub3c4\ub294\uad6c\ub098. "
+        "\uc5b4\ub5a4 \ubd84\uc57c\ub85c \uc62e\uae30\uace0 \uc2f6\uc5b4?"
+    )
+
+    assert segments == [
+        "\uc774\uc9c1 \uc0dd\uac01\uc774 \uacc4\uc18d \uba38\ub9ac\uc5d0 \ub9f4\ub3c4\ub294\uad6c\ub098.",
+        "\uc5b4\ub5a4 \ubd84\uc57c\ub85c \uc62e\uae30\uace0 \uc2f6\uc5b4?",
+    ]
+
+
 def test_runtime_turn_async_job_exposes_first_segment_before_full_turn_tts() -> None:
     reply = "안녕. 오늘 영화 봤어? 재밌었어!"
 

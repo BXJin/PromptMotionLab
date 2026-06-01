@@ -189,6 +189,10 @@ number is `first_timeline_ms`: Unreal can start downloading and playing the
 first ready segment once this appears. After the first segment is exposed,
 remaining segments are synthesized concurrently to reduce total TTS readiness
 time and lower the risk of sentence-to-sentence playback gaps.
+Segment splitting uses a natural first-chunk policy: very short reactions such
+as `그래?` or `오.` are merged with the next sentence when the combined text is
+still short enough. This avoids speaking one-word reactions as isolated audio
+clips while preserving sentence-level latency gains.
 The benchmark also prints `legacy_sequential_remaining_estimate_ms` and
 `parallel_remaining_saved_estimate_ms` for the fixed-delay tail case, which
 shows the improvement from synthesizing the remaining segments in parallel.
