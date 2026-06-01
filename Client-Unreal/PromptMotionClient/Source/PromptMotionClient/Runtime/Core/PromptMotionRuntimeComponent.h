@@ -96,8 +96,8 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PromptMotion|Realtime")
     bool bUseAsyncTurnHttp = true;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PromptMotion|Realtime", meta=(ClampMin="0.05", ClampMax="2.0"))
-    float AsyncTurnPollIntervalSeconds = 0.2f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PromptMotion|Realtime", meta=(ClampMin="0.02", ClampMax="2.0"))
+    float AsyncTurnPollIntervalSeconds = 0.08f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PromptMotion|Realtime")
     FString WebSocketUrl = TEXT("ws://localhost:8010/ws/runtime");

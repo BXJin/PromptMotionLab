@@ -11,6 +11,7 @@ struct FPromptMotionRuntimeEndpointConfig
     bool bUseRealtimeWebSocket = false;
     bool bUseAsyncTurnHttp = true;
     bool bEnableStreamingStt = false;
+    float AsyncTurnPollIntervalSeconds = 0.08f;
 
     bool LoadFromConfig(const FString& ProfileOverride = FString());
 

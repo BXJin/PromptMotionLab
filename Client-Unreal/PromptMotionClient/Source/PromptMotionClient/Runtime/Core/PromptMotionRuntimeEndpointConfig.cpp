@@ -32,6 +32,13 @@ void ReadBool(const TCHAR* Section, const TCHAR* Key, bool& Value)
         Value = LoadedValue;
 }
 
+void ReadFloat(const TCHAR* Section, const TCHAR* Key, float& Value)
+{
+    float LoadedValue = Value;
+    if (GConfig && GConfig->GetFloat(Section, Key, LoadedValue, GGameIni))
+        Value = LoadedValue;
+}
+
 void ReadString(const TCHAR* Section, const TCHAR* Key, FString& Value)
 {
     FString LoadedValue;
@@ -56,6 +63,8 @@ bool FPromptMotionRuntimeEndpointConfig::LoadFromConfig(const FString& ProfileOv
     ReadBool(*ProfileSection, TEXT("bUseRealtimeWebSocket"), bUseRealtimeWebSocket);
     ReadBool(*ProfileSection, TEXT("bUseAsyncTurnHttp"), bUseAsyncTurnHttp);
     ReadBool(*ProfileSection, TEXT("bEnableStreamingStt"), bEnableStreamingStt);
+    ReadFloat(*ProfileSection, TEXT("AsyncTurnPollIntervalSeconds"), AsyncTurnPollIntervalSeconds);
+    AsyncTurnPollIntervalSeconds = FMath::Clamp(AsyncTurnPollIntervalSeconds, 0.02f, 1.0f);
 
     if (!ServerUrl.IsEmpty())
     {

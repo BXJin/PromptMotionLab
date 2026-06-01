@@ -52,6 +52,7 @@ ServerUrl="http://localhost:8010"
 StreamingSttWebSocketUrl="ws://127.0.0.1:8010/ws/stt"
 bUseAsyncTurnHttp=true
 bEnableStreamingStt=true
+AsyncTurnPollIntervalSeconds=0.08
 ```
 
 For packaged Android production builds, switch `ActiveProfile` to `Production`
@@ -86,7 +87,7 @@ or override the runtime profile before packaging.
 Expected streaming logs:
 
 ```text
-[RuntimeConfig] ... streamingStt=true
+[RuntimeConfig] ... streamingStt=true turnPoll=80ms
 [STT] Streaming WebSocket connected: ws://127.0.0.1:8010/ws/stt
 [VoiceLatency] ptt_stop ... streaming=true
 [STT] Streaming final: "..."
@@ -124,6 +125,7 @@ Expected streaming logs:
 | --- | --- |
 | Behavior JSON instead of raw morph arrays | Keeps server response compact and lets Unreal own animation quality |
 | Async turn job | First visible reaction can start before final TTS is ready |
+| 80ms async turn polling | Reduces worst-case wait after server-side TTS segment readiness compared with the older 200ms poll |
 | Streaming STT | Reduces delay after PTT stop compared with batch WAV upload |
 | Local face/lip-sync CSV mappings | Character-specific tuning without changing server contracts |
 | Request ids and stale response checks | Prevents older responses from overwriting newer turns |

@@ -467,8 +467,11 @@ void UPromptMotionRuntimeComponent::PollTurnAsyncJob(const FString& TurnJobId)
                 if (!Self->TurnJobTtsStarted.Contains(TurnJobId))
                 {
                     Self->TurnJobTtsStarted.Add(TurnJobId);
-                    UE_LOG(LogPromptMotion, Log, TEXT("[PromptMotion] TurnAsync first TTS segment ready job=%s segments=%d"),
-                        *TurnJobId, Job.SpeechTimeline.Segments.Num());
+                    UE_LOG(LogPromptMotion, Log, TEXT("[PromptMotion] TurnAsync first TTS segment ready job=%s segments=%d pollElapsedMs=%.0f pollIntervalMs=%.0f"),
+                        *TurnJobId,
+                        Job.SpeechTimeline.Segments.Num(),
+                        (FPlatformTime::Seconds() - Self->TurnJobRequestStartTimes.FindRef(TurnJobId)) * 1000.0,
+                        Self->AsyncTurnPollIntervalSeconds * 1000.0f);
                 }
                 Self->StartTtsTimelineForResponse(FString::Printf(TEXT("ue_%d"), ThisRequestId), Job.SpeechTimeline);
             }
@@ -513,7 +516,7 @@ void UPromptMotionRuntimeComponent::PollTurnAsyncJob(const FString& TurnJobId)
                     if (UPromptMotionRuntimeComponent* Runtime = WeakThis.Get())
                         Runtime->PollTurnAsyncJob(TurnJobId);
                 }),
-                FMath::Max(0.05f, Self->AsyncTurnPollIntervalSeconds),
+                FMath::Max(0.02f, Self->AsyncTurnPollIntervalSeconds),
                 false);
         });
 }
@@ -1011,6 +1014,7 @@ void UPromptMotionRuntimeComponent::ApplyEndpointConfig()
     Config.bUseRealtimeWebSocket = bUseRealtimeWebSocket;
     Config.bUseAsyncTurnHttp = bUseAsyncTurnHttp;
     Config.bEnableStreamingStt = bEnableStreamingStt;
+    Config.AsyncTurnPollIntervalSeconds = AsyncTurnPollIntervalSeconds;
 
     if (!Config.LoadFromConfig(EndpointConfigProfileOverride))
     {
@@ -1024,15 +1028,17 @@ void UPromptMotionRuntimeComponent::ApplyEndpointConfig()
     bUseRealtimeWebSocket = Config.bUseRealtimeWebSocket;
     bUseAsyncTurnHttp = Config.bUseAsyncTurnHttp;
     bEnableStreamingStt = Config.bEnableStreamingStt;
+    AsyncTurnPollIntervalSeconds = Config.AsyncTurnPollIntervalSeconds;
 
-    UE_LOG(LogPromptMotion, Log, TEXT("[RuntimeConfig] profile=%s server=%s runtimeWs=%s streamingSttWs=%s asyncTurn=%s realtimeWs=%s streamingStt=%s"),
+    UE_LOG(LogPromptMotion, Log, TEXT("[RuntimeConfig] profile=%s server=%s runtimeWs=%s streamingSttWs=%s asyncTurn=%s realtimeWs=%s streamingStt=%s turnPoll=%.0fms"),
         *Config.ActiveProfile,
         *ServerUrl,
         *WebSocketUrl,
         *StreamingSttWebSocketUrl,
         bUseAsyncTurnHttp ? TEXT("true") : TEXT("false"),
         bUseRealtimeWebSocket ? TEXT("true") : TEXT("false"),
-        bEnableStreamingStt ? TEXT("true") : TEXT("false"));
+        bEnableStreamingStt ? TEXT("true") : TEXT("false"),
+        AsyncTurnPollIntervalSeconds * 1000.0f);
 }
 void UPromptMotionRuntimeComponent::EnsureApiClient()
 {
