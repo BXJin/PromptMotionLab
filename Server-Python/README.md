@@ -186,7 +186,12 @@ python scripts\benchmark_runtime_turn_tts_latency.py
 
 This benchmark compares full-turn TTS against segmented TTS. The important
 number is `first_timeline_ms`: Unreal can start downloading and playing the
-first ready segment once this appears, while later segments continue to build.
+first ready segment once this appears. After the first segment is exposed,
+remaining segments are synthesized concurrently to reduce total TTS readiness
+time and lower the risk of sentence-to-sentence playback gaps.
+The benchmark also prints `legacy_sequential_remaining_estimate_ms` and
+`parallel_remaining_saved_estimate_ms` for the fixed-delay tail case, which
+shows the improvement from synthesizing the remaining segments in parallel.
 
 Production smoke test from the repository root:
 

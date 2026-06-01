@@ -7,7 +7,7 @@ from enum import StrEnum
 from time import monotonic
 
 from app.contracts.requests import RuntimeRespondRequest
-from app.contracts.runtime_behavior import BehaviorJson
+from app.contracts.runtime_behavior import BehaviorJson, RuntimeTtsStyle
 from app.contracts.speech_timeline import SpeechAudio, SpeechSegment, SpeechTimeline
 from app.services.runtime_async_job_service import RuntimeAsyncJobService
 from app.services.runtime_character_service import RuntimeCharacterResult, RuntimeCharacterService
@@ -201,54 +201,114 @@ class RuntimeTurnAsyncJobService:
         cumulative_start = 0.0
         total_tts_latency_ms = 0
 
-        for index, text in enumerate(texts):
-            segment_timeline = await self._tts_service.synthesize(
-                text=text,
-                tts_style=response_result.behavior.tts_style,
-            )
-            segment = self._create_speech_segment(
-                segment_timeline,
-                index=index,
-                text=text,
-                start_time=cumulative_start,
-            )
-            segments.append(segment)
-            cumulative_start += segment.duration_seconds
-            total_tts_latency_ms += segment.tts_latency_ms
+        first_text = texts[0]
+        first_segment_started_at = monotonic()
+        first_segment_timeline = await self._tts_service.synthesize(
+            text=first_text,
+            tts_style=response_result.behavior.tts_style,
+        )
+        first_segment = self._create_speech_segment(
+            first_segment_timeline,
+            index=0,
+            text=first_text,
+            start_time=cumulative_start,
+        )
+        segments.append(first_segment)
+        cumulative_start += first_segment.duration_seconds
+        total_tts_latency_ms += first_segment.tts_latency_ms
 
-            if group_timeline is None:
-                group_timeline = SpeechTimeline(
-                    utteranceId=f"uttgrp_{uuid.uuid4().hex[:12]}",
-                    audio=segment_timeline.audio,
-                    visemes=segment_timeline.visemes,
-                    segments=list(segments),
-                    provider=segment_timeline.provider,
-                    model=segment_timeline.model,
-                    ttsLatencyMs=total_tts_latency_ms,
+        group_timeline = SpeechTimeline(
+            utteranceId=f"uttgrp_{uuid.uuid4().hex[:12]}",
+            audio=first_segment_timeline.audio,
+            visemes=first_segment_timeline.visemes,
+            segments=list(segments),
+            provider=first_segment_timeline.provider,
+            model=first_segment_timeline.model,
+            ttsLatencyMs=total_tts_latency_ms,
+        )
+        await self._set_partial_speech_timeline(turn_job_id, group_timeline)
+        logger.info(
+            "Runtime turn first TTS segment ready. turn_job_id=%s segment=%d elapsed_ms=%d text_chars=%d",
+            turn_job_id,
+            0,
+            int((monotonic() - first_segment_started_at) * 1000),
+            len(first_text),
+        )
+
+        pending_tasks: dict[asyncio.Task[tuple[int, str, SpeechTimeline, int]], tuple[int, str]] = {}
+        for index, text in enumerate(texts[1:], start=1):
+            pending_tasks[
+                asyncio.create_task(
+                    self._synthesize_tts_segment(
+                        index=index,
+                        text=text,
+                        tts_style=response_result.behavior.tts_style,
+                    )
                 )
-                await self._set_partial_speech_timeline(turn_job_id, group_timeline)
-                logger.info(
-                    "Runtime turn first TTS segment ready. turn_job_id=%s segment=%d elapsed_ms=%d text_chars=%d",
-                    turn_job_id,
-                    index,
-                    int((monotonic() - segment_started_at) * 1000),
-                    len(text),
-                )
-            else:
-                group_timeline.segments = list(segments)
-                group_timeline.tts_latency_ms = total_tts_latency_ms
-                await self._set_partial_speech_timeline(turn_job_id, group_timeline)
-                logger.info(
-                    "Runtime turn TTS segment appended. turn_job_id=%s segment=%d elapsed_ms=%d text_chars=%d",
-                    turn_job_id,
-                    index,
-                    int((monotonic() - segment_started_at) * 1000),
-                    len(text),
-                )
+            ] = (index, text)
+
+        ready_segments: dict[int, tuple[str, SpeechTimeline, int]] = {}
+        next_segment_index = 1
+        try:
+            while pending_tasks:
+                done, _ = await asyncio.wait(pending_tasks.keys(), return_when=asyncio.FIRST_COMPLETED)
+                for task in done:
+                    pending_tasks.pop(task, None)
+                    index, text, segment_timeline, segment_elapsed_ms = task.result()
+                    ready_segments[index] = (text, segment_timeline, segment_elapsed_ms)
+
+                while next_segment_index in ready_segments:
+                    text, segment_timeline, segment_elapsed_ms = ready_segments.pop(next_segment_index)
+                    segment = self._create_speech_segment(
+                        segment_timeline,
+                        index=next_segment_index,
+                        text=text,
+                        start_time=cumulative_start,
+                    )
+                    segments.append(segment)
+                    cumulative_start += segment.duration_seconds
+                    total_tts_latency_ms += segment.tts_latency_ms
+
+                    group_timeline.segments = list(segments)
+                    group_timeline.tts_latency_ms = total_tts_latency_ms
+                    await self._set_partial_speech_timeline(turn_job_id, group_timeline)
+                    logger.info(
+                        "Runtime turn TTS segment appended. turn_job_id=%s segment=%d elapsed_ms=%d segment_tts_ms=%d text_chars=%d",
+                        turn_job_id,
+                        next_segment_index,
+                        int((monotonic() - segment_started_at) * 1000),
+                        segment_elapsed_ms,
+                        len(text),
+                    )
+                    next_segment_index += 1
+        except Exception:
+            for task in pending_tasks:
+                task.cancel()
+            await asyncio.gather(*pending_tasks, return_exceptions=True)
+            raise
 
         if group_timeline is None:
             raise RuntimeError("Segmented TTS did not produce a speech timeline")
         return group_timeline
+
+    async def _synthesize_tts_segment(
+        self,
+        *,
+        index: int,
+        text: str,
+        tts_style: RuntimeTtsStyle,
+    ) -> tuple[int, str, SpeechTimeline, int]:
+        started_at = monotonic()
+        segment_timeline = await self._tts_service.synthesize(
+            text=text,
+            tts_style=tts_style,
+        )
+        return (
+            index,
+            text,
+            segment_timeline,
+            int((monotonic() - started_at) * 1000),
+        )
 
     @staticmethod
     def _create_speech_segment(

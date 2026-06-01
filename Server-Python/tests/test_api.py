@@ -942,6 +942,67 @@ def test_runtime_turn_async_job_exposes_first_segment_before_full_turn_tts() -> 
     assert segmented_first_timeline < full_turn_timeline
 
 
+def test_runtime_turn_async_job_synthesizes_remaining_segments_in_parallel() -> None:
+    reply = "짧아. 두 번째 문장은 조금 길게 말해볼게. 세 번째 문장도 비슷하게 길게 말해볼게."
+
+    class ThreeSentenceProvider(RuntimeBehaviorProvider):
+        async def respond(
+            self,
+            message: str,
+            scene_context: SceneContext,
+            character_id: str,
+            conversation_history: list | None = None,
+            character_profile: object | None = None,
+        ) -> tuple[str, BehaviorJson]:
+            del message, scene_context, character_id, conversation_history, character_profile
+            return reply, BehaviorJson(intent="answer", emotion="friendly")
+
+    class FixedDelayTtsProvider(TtsProvider):
+        provider_name = "FixedDelayTtsProvider"
+        model_name = "parallel-check"
+
+        async def synthesize(self, *, text, output_path, tts_style, voice=None):
+            del tts_style, voice
+            await asyncio.sleep(0.03 if text == "짧아." else 0.12)
+            return TtsResult(
+                audio_path=output_path,
+                duration_seconds=0.2,
+                visemes=[],
+                provider=self.provider_name,
+                model=self.model_name,
+            )
+
+    service = RuntimeTurnAsyncJobService(
+        RuntimeCharacterService(primary_provider=ThreeSentenceProvider()),
+        TtsService(
+            provider=FixedDelayTtsProvider(),
+            fallback_provider=FixedDelayTtsProvider(),
+            provider_timeout_seconds=1,
+            fallback_timeout_seconds=1,
+        ),
+    )
+
+    async def run_case() -> tuple[float, float, int]:
+        job = await service.submit(RuntimeRespondRequestForTest("hello", "default_girl", "turn_parallel_tts"))
+        started = time.monotonic()
+        first_timeline_at = -1.0
+        deadline = started + 1.0
+        while time.monotonic() < deadline:
+            current = await service.get(job.turn_job_id)
+            if current and current.speech_timeline is not None and first_timeline_at < 0:
+                first_timeline_at = time.monotonic() - started
+            if current and current.status == "succeeded":
+                return first_timeline_at, time.monotonic() - started, len(current.speech_timeline.segments)
+            await asyncio.sleep(0.005)
+        raise AssertionError("parallel segmented TTS job did not finish")
+
+    first_timeline_seconds, total_seconds, segment_count = asyncio.run(run_case())
+
+    assert segment_count == 3
+    assert first_timeline_seconds < 0.08
+    assert total_seconds < 0.22
+
+
 def test_runtime_turn_async_job_returns_single_segment_for_single_sentence_reply() -> None:
     class SingleSentenceProvider(RuntimeBehaviorProvider):
         async def respond(
